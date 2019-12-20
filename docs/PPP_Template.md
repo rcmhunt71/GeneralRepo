@@ -6,26 +6,52 @@
 ## Progress
 
 ### Completed
-> General format: **Name**: Product: Component: Description of completed activity
+> General format: **Name**: Component: Description of completed activity
+
+**PRODUCT 1**
 * 
 *
 
+**PRODUCT 2**
+* 
+*
+
+
 ### In Progress
-> General format: **Name**: Product: Component: Description of completed activity | Completion Date
+> General format: **Name**: Component: Description of completed activity | Completion Date
+
+
+**PRODUCT 1**
+* 
+*
+
+**PRODUCT 2**
 * 
 *
 
 
 ## Plans
-> General format: **Name**: Product: Component: Description of planned activity | Completion Date
-* 
-* 
+> General format: **Name**: Component: Description of planned activity | Completion Date
 
+**PRODUCT 1**
+* 
+*
+
+**PRODUCT 2**
+* 
+*
+ 
 
 ## Problems
 
-> General format: **Name**: Product: Component: Description of Issue | Mitigation Strategy, if any.
+> General format: **Name**: Component: Description of Issue | Mitigation Strategy, if any.
+
+**PRODUCT 1**
+* 
 *
+
+**PRODUCT 2**
+* 
 *
   
  
