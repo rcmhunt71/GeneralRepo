@@ -9,10 +9,12 @@
 > General format: **Name**: Component: Description of completed activity
 
 **PRODUCT 1**
+
 * 
 *
 
 **PRODUCT 2**
+
 * 
 *
 
@@ -22,10 +24,12 @@
 
 
 **PRODUCT 1**
+
 * 
 *
 
 **PRODUCT 2**
+
 * 
 *
 
@@ -34,10 +38,12 @@
 > General format: **Name**: Component: Description of planned activity | Completion Date
 
 **PRODUCT 1**
+
 * 
 *
 
 **PRODUCT 2**
+
 * 
 *
  
@@ -47,10 +53,12 @@
 > General format: **Name**: Component: Description of Issue | Mitigation Strategy, if any.
 
 **PRODUCT 1**
+
 * 
 *
 
 **PRODUCT 2**
+
 * 
 *
   
