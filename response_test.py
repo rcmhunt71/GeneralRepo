@@ -1,15 +1,22 @@
 #!/usr/bin/env python
 
-from PRICE.assets.add_automobile import AddAutomobileResponse
+from PRICE.assets.responses.add_automobile import AddAutomobileResponse
 from PRICE.assets.models.asset import AssetKeys, Asset
 from PRICE.assets.models.assets import AssetsKeys, Assets
-from PRICE.assets.get_assets import AssetsResponse
+from PRICE.assets.responses.get_assets import AssetsResponse
 from PRICE.assets.models.automobile import AutomobileKeys
+
 from PRICE.common.models.stats import Stats, StatsKeys
 from PRICE.common.models.version import Version, VersionKeys
 from PRICE.common.response import CommonResponse, CommonResponseKeys
+
+from PRICE.company.responses.add_company import AddCompanyResponse
+from PRICE.company.responses.get_companies import GetCompaniesResponse
+from PRICE.company.models.company import CompanyKeys, Company
+from PRICE.company.models.companies import CompaniesKeys, Companies
+from PRICE.company.responses.get_company_ids import GetCompanyIDsResponse, GetCompanyIDsKeys
+
 from PRICE.configuration.configuration_list import ConfigurationList, ConfigurationListKeys
-from PRICE.company.add_company import AddCompanyResponse
 
 # ---------------------------------------------------------------
 #     TEST DATA
@@ -35,6 +42,15 @@ config_list = [
     "Ms.",
     "Miss",
     "Dr.",
+]
+
+company_ids = [
+    123,
+    456,
+    789,
+    98,
+    333,
+    777
 ]
 
 response_args = {
@@ -78,7 +94,28 @@ asset_2 = {
     AssetKeys.RETIREMENT_FUND_DETAIL: "Yadda Yadda Yadda",
 }
 
+company_args_1 = {
+    CompanyKeys.COMPANY_ID: 'CMP111',
+    CompanyKeys.COMPANY_NAME: 'Test Company 1',
+    CompanyKeys.VOICE: '5558004673',
+    CompanyKeys.ADDRESS: "123 SomePlace Drive",
+    CompanyKeys.CITY: "Albany",
+    CompanyKeys.STATE: "NY",
+    CompanyKeys.ZIP: 78108,
+}
+
+company_args_2 = {
+    CompanyKeys.COMPANY_ID: 'CMP222',
+    CompanyKeys.COMPANY_NAME: 'Test Company 2',
+    CompanyKeys.VOICE: '5558004674',
+    CompanyKeys.ADDRESS: "978 SomeWhere Lane",
+    CompanyKeys.CITY: "San Diego",
+    CompanyKeys.STATE: "CA",
+    CompanyKeys.ZIP: 87404,
+}
+
 assets = [asset_1, asset_2]
+companies = [company_args_1, company_args_2]
 
 # ---------------------------------------------------------------
 #   VALIDATION SECTION
@@ -124,3 +161,22 @@ print(f"Auto ID: {auto.AutomobileID}")
 add_company_args = response_args.copy()
 company = AddCompanyResponse(**add_company_args)
 print(f"ADD COMPANY:\n{company}")
+
+company_data = Company(**company_args_1)
+print(f"Company:\n{company_data}")
+
+companies_data = Companies(*companies)
+print(f"Companies:\n{companies_data}")
+print(f"DATA: {companies_data[0].CompanyName}")
+
+get_company_args = response_args.copy()
+get_company_args[CompaniesKeys.COMPANIES] = companies
+companies_resp = GetCompaniesResponse(**get_company_args)
+print(f"Companies:\n{companies_resp}")
+print(f"DATA: {companies_resp.Companies[1].CompanyName}")
+
+company_ids_args = response_args.copy()
+company_ids_args[GetCompanyIDsKeys.COMPANY_IDS] = company_ids
+company_ids_response = GetCompanyIDsResponse(**company_ids_args)
+print(f"COMPANY ID LIST:\n{company_ids_response}")
+print(f"COMPANY ID #3:\n{company_ids_response.CompanyIds[2]}")
