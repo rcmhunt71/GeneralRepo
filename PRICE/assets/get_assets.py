@@ -1,8 +1,8 @@
-from APIs.responses.models.assets import AssetsKeys, Assets
-from APIs.responses.common_response import Response
+from PRICE.assets.models.assets import AssetsKeys, Assets
+from PRICE.common.response import CommonResponse
 
 
-class AssetsResponse(Response):
+class AssetsResponse(CommonResponse):
 
     def __init__(self, keys=None, objs=None, **kwargs):
 

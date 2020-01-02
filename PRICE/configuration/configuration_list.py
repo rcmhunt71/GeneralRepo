@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from APIs.responses.common_response import Response
+from PRICE.common.response import CommonResponse
 
 
 @dataclass
@@ -8,7 +8,7 @@ class ConfigurationListKeys:
     CONFIGURATION_LIST: str = "ConfigurationList"
 
 
-class ConfigurationList(Response):
+class ConfigurationList(CommonResponse):
 
     def __init__(self, **kwargs):
         self._VARS = [ConfigurationListKeys.CONFIGURATION_LIST]

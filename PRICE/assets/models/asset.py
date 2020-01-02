@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from APIs.responses.base_response import BaseResponse
+from PRICE.abstract.base_response import BaseResponse
 
 
 @dataclass

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from APIs.responses.models.asset import Asset
+from PRICE.assets.models.asset import Asset
 
 
 @dataclass
