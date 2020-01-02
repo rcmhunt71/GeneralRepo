@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from PRICE.abstract.base_response import BaseListResponse
 from PRICE.company.models.company import Company
 
 
@@ -8,10 +9,5 @@ class CompaniesKeys:
     COMPANIES: str = 'Companies'
 
 
-class Companies(list):
-    def __init__(self, *args):
-        super().__init__()
-        self.extend([Company(**company_dict) for company_dict in args])
-
-    def to_struct(self):
-        return [x.to_struct() for x in self]
+class Companies(BaseListResponse):
+    SUB_MODEL = Company

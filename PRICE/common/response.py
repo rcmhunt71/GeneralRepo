@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
 from PRICE.abstract.base_response import BaseResponse
-from PRICE.common.models.stats import Stats as StatsModel
-from PRICE.common.models.version import Version as VersionModel
+from PRICE.common.models.stats import StatsModel
+from PRICE.common.models.version import VersionModel
 
 
 @dataclass
@@ -29,9 +29,9 @@ class CommonResponse(BaseResponse):
 
         self._combine_args(keys=keys, objs=objs)
 
-        if kwargs.get(CommonResponseKeys.VERSION) is not None:
+        if CommonResponseKeys.VERSION in kwargs and kwargs.get(CommonResponseKeys.VERSION) is not None:
             kwargs[CommonResponseKeys.VERSION] = VersionModel(**kwargs.get(CommonResponseKeys.VERSION))
-        if kwargs.get(CommonResponseKeys.STATS) is not None:
+        if CommonResponseKeys.STATS in kwargs and kwargs.get(CommonResponseKeys.STATS) is not None:
             kwargs[CommonResponseKeys.STATS] = StatsModel(**kwargs.get(CommonResponseKeys.STATS))
 
         super().__init__(keys=self._VARS, objs=self._OBJS, **kwargs)

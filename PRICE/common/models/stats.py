@@ -11,7 +11,7 @@ class StatsKeys:
     LOSTIME: str = 'LOSTime'
 
 
-class Stats(BaseResponse):
+class StatsModel(BaseResponse):
 
     def __init__(self, **kwargs):
         self._VARS = [StatsKeys.TOTAL_DATABASE_TIME, StatsKeys.TOTAL_SERVER_TIME, StatsKeys.METHOD_TIME,

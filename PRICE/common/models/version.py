@@ -11,7 +11,7 @@ class VersionKeys:
     BUILD: str = 'Build'
 
 
-class Version(BaseResponse):
+class VersionModel(BaseResponse):
 
     def __init__(self, **kwargs):
         self._VARS = [VersionKeys.MAJOR_VERSION, VersionKeys.MINOR_VERSION, VersionKeys.HOT_FIX,
@@ -19,6 +19,6 @@ class Version(BaseResponse):
 
         super().__init__(keys=self._VARS, **kwargs)
 
-    def full_version(self):
-        return (f"{getattr(self, VersionKeys.MAJOR_VERSION)}.{getattr(self, VersionKeys.MINOR_VERSION)}."
-                f"{getattr(self, VersionKeys.BUILD)}.{getattr(self, VersionKeys.HOT_FIX)}")
+    def full_version_info(self):
+        return (f"{getattr(self, VersionKeys.MAJOR_VERSION)}.{getattr(self, VersionKeys.MINOR_VERSION)}:"
+                f"build-{getattr(self, VersionKeys.BUILD)}.{getattr(self, VersionKeys.HOT_FIX)}")

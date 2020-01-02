@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from PRICE.abstract.base_response import BaseListResponse
 from PRICE.assets.models.asset import Asset
 
 
@@ -8,10 +9,5 @@ class AssetsKeys:
     ASSETS: str = 'Assets'
 
 
-class Assets(list):
-    def __init__(self, *args):
-        super().__init__()
-        self.extend([Asset(**asset_dict) for asset_dict in args])
-
-    def to_struct(self):
-        return [x.to_struct() for x in self]
+class Assets(BaseListResponse):
+    SUB_MODEL = Asset
