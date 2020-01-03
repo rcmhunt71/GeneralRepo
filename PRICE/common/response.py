@@ -20,6 +20,9 @@ class CommonResponseKeys:
 
 class CommonResponse(BaseResponse):
 
+    ADD_KEYS = [CommonResponseKeys.VERSION, CommonResponseKeys.STATS]
+    SUB_MODELS = [VersionModel, StatsModel]
+
     def __init__(self, keys=None, objs=None, **kwargs):
 
         self._VARS = [CommonResponseKeys.SUCCESSFUL, CommonResponseKeys.ERROR_MESSAGE,
@@ -28,11 +31,6 @@ class CommonResponse(BaseResponse):
         self._OBJS = [CommonResponseKeys.STATS, CommonResponseKeys.VERSION]
 
         self._combine_args(keys=keys, objs=objs)
-
-        if CommonResponseKeys.VERSION in kwargs and kwargs.get(CommonResponseKeys.VERSION) is not None:
-            kwargs[CommonResponseKeys.VERSION] = VersionModel(**kwargs.get(CommonResponseKeys.VERSION))
-        if CommonResponseKeys.STATS in kwargs and kwargs.get(CommonResponseKeys.STATS) is not None:
-            kwargs[CommonResponseKeys.STATS] = StatsModel(**kwargs.get(CommonResponseKeys.STATS))
 
         super().__init__(keys=self._VARS, objs=self._OBJS, **kwargs)
 

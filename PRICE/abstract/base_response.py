@@ -34,7 +34,8 @@ class BaseResponse:
             for key, model in zip(self.ADD_KEYS, self.SUB_MODELS):
                 if key in kwargs and kwargs.get(key) is not None:
                     if model is not None:
-                        kwargs[key] = model(*kwargs.get(key))
+                        data = kwargs.get(key)
+                        kwargs[key] = model(*data) if isinstance(data, list) else model(**data)
                         self._OBJS.append(key)
                     else:
                         self._VARS.append(key)
