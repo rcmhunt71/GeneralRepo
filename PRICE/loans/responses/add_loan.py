@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 
 from PRICE.common.response import CommonResponse
-from PRICE.loans.models.loan_data import DataTable, DataTableKeys
+from PRICE.loans.models.loan_data import (DataTable, DataTableKeys, DataTableColumnEntryKeys,
+                                          DataRowValueKeys, DataRowColKeys)
+
 
 @dataclass
 class AddLoanKeys:
@@ -25,3 +27,14 @@ class GetLoan(CommonResponse):
 
         kwargs[DataTableKeys.DATA_TABLE] = DataTable(**kwargs.get(DataTableKeys.DATA_TABLE))
         super().__init__(keys=None, objs=self._OBJS, **kwargs)
+
+    def show_data_table(self):
+        table_data = getattr(self, DataTableKeys.DATA_TABLE)
+        table = [[getattr(col, DataTableColumnEntryKeys.LABEL) for col in
+                  getattr(table_data, DataTableKeys.COLS)]]
+
+        for row_dict in getattr(table_data, DataTableKeys.ROWS):
+            row_data = [getattr(row, DataRowValueKeys.VALUE) for row in getattr(row_dict, DataRowColKeys.COL)]
+            table.append(row_data)
+
+        print(table)

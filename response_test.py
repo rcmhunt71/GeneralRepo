@@ -1,30 +1,25 @@
 #!/usr/bin/env python
-import pprint
 
-from PRICE.assets.responses.add_automobile import AddAutomobileResponse
 from PRICE.assets.models.asset import AssetKeys, Asset
 from PRICE.assets.models.assets import AssetsKeys, Assets
-from PRICE.assets.responses.get_assets import AssetsResponse
 from PRICE.assets.models.automobile import AutomobileKeys
-
+from PRICE.assets.responses.add_automobile import AddAutomobileResponse
+from PRICE.assets.responses.get_assets import AssetsResponse
 from PRICE.common.models.stats import StatsModel, StatsKeys
 from PRICE.common.models.version import VersionModel, VersionKeys
 from PRICE.common.response import CommonResponse, CommonResponseKeys
-
+from PRICE.company.models.companies import CompaniesKeys, Companies
+from PRICE.company.models.company import CompanyKeys, Company
 from PRICE.company.responses.add_company import AddCompanyResponse
 from PRICE.company.responses.get_companies import GetCompaniesResponse
-from PRICE.company.models.company import CompanyKeys, Company
-from PRICE.company.models.companies import CompaniesKeys, Companies
 from PRICE.company.responses.get_company_ids import GetCompanyIDsResponse, GetCompanyIDsKeys
-
 from PRICE.configuration.configuration_list import ConfigurationList, ConfigurationListKeys
-
-from PRICE.loans.responses.add_loan import AddLoanKeys, AddLoan, GetLoan
-from PRICE.loans.responses.get_final_value_tags import GetFinalValueTags
 from PRICE.loans.models.final_value import FinalValueFieldsKeys, FinalValueScreenKeys
 from PRICE.loans.models.loan_data import (DataTableColumnEntryKeys, DataRowValueKeys, DataTableKeys, DataColumnEntry,
                                           DataCols, RowValueEntry, RowColsValue, DataRowColKeys, RowEntry, RowList,
                                           DataTable)
+from PRICE.loans.responses.add_loan import AddLoanKeys, AddLoan, GetLoan
+from PRICE.loans.responses.get_final_value_tags import GetFinalValueTags
 
 # ---------------------------------------------------------------
 #     TEST DATA
@@ -267,12 +262,9 @@ print(f"DATA LABEL: {data_table_resp.rows[1].c[1].v}")
 
 get_loan_data = response_args.copy()
 get_loan_data[DataTableKeys.DATA_TABLE] = data_table
-
-print(f"Data Table:\n{pprint.pformat(data_table)}\n")
-print(f"GET LOAN DATA:\n{pprint.pformat(get_loan_data)}\n")
-
 get_loan_resp = GetLoan(**get_loan_data)
 print(f"VERSION: {get_loan_resp.Version.full_version_info()}")
-print(f"Has Data Element: {hasattr(get_loan_resp, DataTableKeys.DATA_TABLE)}")
 print(f"get_loan_resp.Data.rows[0].c[1].v: {get_loan_resp.Data.rows[0].c[0].v}")
 print(f"get_loan_resp.Data.rows[1].c[2].v: {get_loan_resp.Data.rows[1].c[0].v}")
+
+get_loan_resp.show_data_table()
