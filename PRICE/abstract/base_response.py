@@ -69,6 +69,7 @@ class BaseListResponse(list):
 
     def __init__(self, *arg_list):
         super().__init__()
+        self.raw = arg_list
         self.extend([self.SUB_MODEL(**value_dict) for value_dict in arg_list])
 
     def to_struct(self):
