@@ -287,7 +287,7 @@ print(f"COMPANY ID #3:\n{company_ids_response.CompanyIds[2]}\n")
 add_loan_args = response_args.copy()
 add_loan_args[AddLoanKeys.NEW_LOAN_NUMBER_ID] = loan_id
 add_loan_response = AddLoan(**add_loan_args)
-print(f"ADD LOAN RESPONSE:\n{add_loan_response}")
+# print(f"ADD LOAN RESPONSE:\n{add_loan_response}")
 print(f"NEW LOAN ID: {add_loan_response.get_loan_id()}\n")
 
 get_fv_tags_args = response_args.copy()

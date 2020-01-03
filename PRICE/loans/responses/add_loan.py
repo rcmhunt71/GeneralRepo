@@ -9,10 +9,8 @@ class AddLoanKeys:
 
 
 class AddLoan(CommonResponse):
-
-    def __init__(self, **kwargs):
-        self._VARS = [AddLoanKeys.NEW_LOAN_NUMBER_ID]
-        super().__init__(keys=self._VARS, **kwargs)
+    ADD_KEYS = [AddLoanKeys.NEW_LOAN_NUMBER_ID]
+    SUB_MODELS = [None]
 
     def get_loan_id(self):
         return getattr(self, AddLoanKeys.NEW_LOAN_NUMBER_ID, None)
