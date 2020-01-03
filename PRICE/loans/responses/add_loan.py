@@ -37,4 +37,5 @@ class GetLoan(CommonResponse):
             row_data = [getattr(row, DataRowValueKeys.VALUE) for row in getattr(row_dict, DataRowColKeys.COL)]
             table.append(row_data)
 
+        # TODO: Create proper ASCII table via PrettyTable or implement simple array table
         print(table)

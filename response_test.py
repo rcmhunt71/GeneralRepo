@@ -137,22 +137,36 @@ data_column_args_2 = {
     DataTableColumnEntryKeys.TYPE: "number",
 }
 
-data_columns_list = [data_column_args_1, data_column_args_2]
-
-value_entry_1 = {DataRowValueKeys.VALUE: 4}
-value_entry_2 = {DataRowValueKeys.VALUE: 7}
-
-value_entry_3 = {DataRowValueKeys.VALUE: 40}
-value_entry_4 = {DataRowValueKeys.VALUE: 70}
+data_column_args_3 = {
+    DataTableColumnEntryKeys.ID: "Owner_Name",
+    DataTableColumnEntryKeys.LABEL: "Owner Name",
+    DataTableColumnEntryKeys.TYPE: "string",
+}
 
 
-col_values_list_1 = [value_entry_1, value_entry_2]
-col_values_list_2 = [value_entry_3, value_entry_4]
+data_columns_list = [data_column_args_3, data_column_args_1, data_column_args_2]
+
+value_entry_1 = {DataRowValueKeys.VALUE: "Bobby McFerrin"}
+value_entry_2 = {DataRowValueKeys.VALUE: 1}
+value_entry_3 = {DataRowValueKeys.VALUE: 10}
+
+value_entry_4 = {DataRowValueKeys.VALUE: "George Burns"}
+value_entry_5 = {DataRowValueKeys.VALUE: 2}
+value_entry_6 = {DataRowValueKeys.VALUE: 20}
+
+value_entry_7 = {DataRowValueKeys.VALUE: "Goose"}
+value_entry_8 = {DataRowValueKeys.VALUE: 3}
+value_entry_9 = {DataRowValueKeys.VALUE: 30}
+
+col_values_list_1 = [value_entry_1, value_entry_2, value_entry_3]
+col_values_list_2 = [value_entry_4, value_entry_5, value_entry_6]
+col_values_list_3 = [value_entry_7, value_entry_8, value_entry_9]
 
 col_value_dict_1 = {DataRowColKeys.COL: col_values_list_1}
 col_value_dict_2 = {DataRowColKeys.COL: col_values_list_2}
+col_value_dict_3 = {DataRowColKeys.COL: col_values_list_3}
 
-row_datum_1 = [col_value_dict_1, col_value_dict_2]
+row_datum_1 = [col_value_dict_1, col_value_dict_2, col_value_dict_3]
 
 data_table = {DataTableKeys.COLS: data_columns_list,
               DataTableKeys.ROWS: row_datum_1}
@@ -242,7 +256,7 @@ print(f"DATA COLUMN ENTRY: {dc_resp}\n")
 dc_cols_resp = DataCols(*data_columns_list)
 print(f"DATA COLS:\n{dc_cols_resp}\n")
 
-val_resp = RowValueEntry(**value_entry_1)
+val_resp = RowValueEntry(**value_entry_2)
 print(f"ROW DATA VALUE: {val_resp}\n")
 
 val_col_resp = RowColsValue(*col_values_list_1)
@@ -268,3 +282,4 @@ print(f"get_loan_resp.Data.rows[0].c[1].v: {get_loan_resp.Data.rows[0].c[0].v}")
 print(f"get_loan_resp.Data.rows[1].c[2].v: {get_loan_resp.Data.rows[1].c[0].v}")
 
 get_loan_resp.show_data_table()
+print(getattr(get_loan_resp, CommonResponseKeys.STATS).raw)

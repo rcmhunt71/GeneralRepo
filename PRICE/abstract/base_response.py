@@ -13,6 +13,7 @@ class BaseResponse:
     def __init__(self, keys=None, objs=None, **kwargs):
         self._VARS = []
         self._OBJS = []
+        self.raw = kwargs
 
         self._combine_args(keys=keys, objs=objs)
 
