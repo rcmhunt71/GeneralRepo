@@ -2,6 +2,8 @@ from PRICE.common.models.stats import StatsKeys
 from PRICE.common.models.version import VersionKeys
 from PRICE.common.response import CommonResponseKeys
 from PRICE.credit.models.credit_report_import_ready import CreditReportImportReadyKeys
+from PRICE.credit.models.import_credit_report import ImportCreditReportKeys
+from PRICE.credit.responses.import_credit_report import ImportCreditReport
 from PRICE.credit.responses.is_credit_report_import_ready import CreditReportImportReady
 
 version_args = {
@@ -33,6 +35,13 @@ import_ready_args = response_args.copy()
 import_ready_args[CreditReportImportReadyKeys.READY_TO_IMPORT] = True
 
 import_ready_response = CreditReportImportReady(**import_ready_args)
-print(f"OBJ:\n{import_ready_args}")
+print(f"OBJ:\n{import_ready_response}")
 print(f"Is credit report import ready? "
-      f"{getattr(import_ready_response, CreditReportImportReadyKeys.READY_TO_IMPORT)}")
+      f"{getattr(import_ready_response, CreditReportImportReadyKeys.READY_TO_IMPORT)}\n")
+
+import_report_args = response_args.copy()
+import_report_args[ImportCreditReportKeys.WAS_THERE_ANYTHING_IMPORTED] = False
+import_report_response = ImportCreditReport(**import_report_args)
+print(f"OBJ:\n{import_report_response}")
+print(f"Was credit report imported? "
+      f"{getattr(import_report_response, ImportCreditReportKeys.WAS_THERE_ANYTHING_IMPORTED)}\n")
