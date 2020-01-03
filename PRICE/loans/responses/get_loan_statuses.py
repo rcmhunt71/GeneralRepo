@@ -12,5 +12,3 @@ class GetLoanStatuses(CommonResponse):
         self._combine_args(objs=self._OBJS)
         kwargs[key] = model(*kwargs.get(key))
         super().__init__(objs=self._OBJS, **kwargs)
-
-
