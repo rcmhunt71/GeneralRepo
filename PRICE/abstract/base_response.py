@@ -1,5 +1,9 @@
 import pprint
 
+from PRICE.logger.logging import Logger
+
+log = Logger(added_depth=1)
+
 
 class ModelKeyMismatch(Exception):
     def __init__(self):
@@ -14,8 +18,12 @@ class BaseResponse:
         self._VARS = []
         self._OBJS = []
         self.raw = kwargs
+        self.model_name = self.__class__.__name__
+
+        log.debug(f"Instantiating '{self.model_name}'")
 
         self._combine_args(keys=keys, objs=objs)
+        log.debug(f"COMBINED PARAMETERS:\n\tself._VARS: {self._VARS}\n\tself._OBJS: {self._OBJS}")
 
         if self.ADD_KEYS is not None:
             # If only adding KEYS & no MODELS (nested sub-objects), create a list of NONE models
@@ -41,6 +49,7 @@ class BaseResponse:
                         self._VARS.append(key)
 
         # Add each sub_model object or keyword to the base model object, based on what is in the **kwargs dict.
+        log.debug(f"Updated KWARGS:\n{pprint.pformat(kwargs)}\n")
         for keyword, value in kwargs.items():
             if keyword in self._VARS or keyword in self._OBJS:
                 setattr(self, keyword, value)
@@ -69,6 +78,9 @@ class BaseListResponse(list):
 
     def __init__(self, *arg_list):
         super().__init__()
+        self.model_name = self.__class__.__name__
+
+        log.debug(f"KWARGS:\n{pprint.pformat(arg_list)}\n")
         self.raw = arg_list
         self.extend([self.SUB_MODEL(**value_dict) for value_dict in arg_list])
 

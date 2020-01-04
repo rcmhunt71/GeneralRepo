@@ -1,0 +1,7 @@
+TODO List:
+* Add docstrings
+* Add JSON schema examples to models to show what is generated.
+* Add README on usage
+* Add document on Object Model hierarchy and architecture
+    - set DEBUG=1 to enable debug logging
+    - set DEBUG= to reset logging to default level (INFO)

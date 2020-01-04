@@ -9,8 +9,6 @@ class GetCompanyIDsKeys:
 
 
 class GetCompanyIDsResponse(CommonResponse):
-
     def __init__(self, **kwargs):
         self._VARS = [GetCompanyIDsKeys.COMPANY_IDS]
-        print(f"TEST: {self._VARS}")
         super().__init__(keys=self._VARS, **kwargs)
