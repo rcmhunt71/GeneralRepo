@@ -2,11 +2,17 @@ import unittest
 
 from PRICE.loans.models.add_loan_data import (
     AddLoanDataColEntryKeys, AddLoanRowValueKeys, AddLoanDataTableKeys, AddLoanDataColEntry, AddLoanDataCols,
-    AddLoanValueEntry, AddLoanRowColsValue, AddLoanRowColKeys)
+    AddLoanValueEntry, AddLoanRowColsValue, AddLoanRowColKeys, AddLoanRowEntry, AddLoanRowList, AddLoanDataTable)
 from PRICE.loans.models.final_value import FinalValueFieldsKeys, FinalValueScreenKeys
+from PRICE.loans.models.loan_detail_data import LoanDetailDataTableKeys
 from PRICE.loans.responses.add_loan import AddLoanKeys, AddLoan
 from PRICE.loans.responses.get_final_value_tags import GetFinalValueTags
+from PRICE.loans.responses.get_loan import GetLoan
+from PRICE.loans.responses.get_loan_detail import GetLoanDetail
+from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
+
+log = Logger()
 
 # ---------------------------------------------------------------
 #     TEST DATA
@@ -101,8 +107,13 @@ class TestGetFinalValueTags(unittest.TestCase, CommonResponseValidations):
 
         # Verify FinalValue tags are in model
         for attr, attr_data_list in fv_data:
-            self.assertTrue(hasattr(fb_tags_resp, attr))
-            self.assertListEqual(getattr(fb_tags_resp, attr), attr_data_list)
+            self._verify(
+                descript=f"{fb_tags_resp.model_name}: Model has '{attr}' attribute",
+                actual=hasattr(fb_tags_resp, attr), expected=True)
+
+            self._verify(
+                descript=f"{fb_tags_resp.model_name}: Attribute '{attr}' are identical",
+                actual=getattr(fb_tags_resp, attr), expected=attr_data_list)
 
         # Verify response contains correct common data
         self._validate_response(model=fb_tags_resp, model_data=get_fv_tags_args)
@@ -110,12 +121,16 @@ class TestGetFinalValueTags(unittest.TestCase, CommonResponseValidations):
     def test_get_final_value_fields_response_method(self):
         key = FinalValueFieldsKeys.FINAL_VALUE_FIELD
         fb_tags_resp = GetFinalValueTags(**get_fv_tags_args)
-        self.assertListEqual(getattr(fb_tags_resp, key), fb_tags_resp.get_final_value_fields())
+        self._verify(
+            descript=f"{fb_tags_resp.model_name}: '{key}' lists are identical",
+            actual=getattr(fb_tags_resp, key), expected=fb_tags_resp.get_final_value_fields())
 
     def test_get_final_value_screen_response_method(self):
         key = FinalValueScreenKeys.FINAL_VALUE_SCREEN
         fb_tags_resp = GetFinalValueTags(**get_fv_tags_args)
-        self.assertListEqual(getattr(fb_tags_resp, key), fb_tags_resp.get_final_value_screens())
+        self._verify(
+            descript=f"{fb_tags_resp.model_name}: '{key}' lists are identical",
+            actual=getattr(fb_tags_resp, key), expected=fb_tags_resp.get_final_value_screens())
 
 
 class TestAddLoanData(unittest.TestCase, CommonResponseValidations):
@@ -125,7 +140,11 @@ class TestAddLoanData(unittest.TestCase, CommonResponseValidations):
 
     def test_AddLoanDataCols_model(self):
         dc_cols_resp = AddLoanDataCols(*add_loan_data_columns_list)
-        self.assertEqual(len(dc_cols_resp), len(add_loan_data_columns_list))
+
+        self._verify(
+            descript=f"{dc_cols_resp.model_name}: Num of data column elements are equal",
+            actual=len(dc_cols_resp), expected=len(add_loan_data_columns_list))
+
         for index, col_header_model in enumerate(dc_cols_resp):
             self._validate_response(model=col_header_model, model_data=add_loan_data_columns_list[index])
 
@@ -135,9 +154,80 @@ class TestAddLoanData(unittest.TestCase, CommonResponseValidations):
 
     def test_AddLoanRowColValue_model(self):
         val_col_resp_model = AddLoanRowColsValue(*add_loan_col_values_list_1)
-        self.assertEqual(len(val_col_resp_model), len(add_loan_col_values_list_1))
+
+        self._verify(
+            descript=f"{val_col_resp_model.model_name}: Num of col_value elements match data",
+            actual=len(val_col_resp_model), expected=len(add_loan_col_values_list_1))
+
         for index, row_value_model in enumerate(val_col_resp_model):
             self._validate_response(model=row_value_model, model_data=add_loan_col_values_list_1[index])
+
+    def test_AddLoanRowEntry_model(self):
+        # Get the data keyword to be added to the response
+        key = AddLoanRowEntry.ADD_KEYS[0]
+        val_col_dict_resp = AddLoanRowEntry(**add_loan_col_value_dict_1)
+
+        self._verify(
+            descript=f"{val_col_dict_resp.model_name}: Num of '{key}' elements are equal",
+            actual=len(getattr(val_col_dict_resp, key)),
+            expected=len(add_loan_col_values_list_1))
+
+        self._validate_response(model=val_col_dict_resp, model_data=add_loan_col_value_dict_1)
+
+    def test_AddLoanRowList_model(self):
+        row_data_resp = AddLoanRowList(*add_loan_row_datum_1)
+        self._verify(
+            descript=f"{row_data_resp.model_name}: Num of col_value elements match data",
+            actual=len(row_data_resp), expected=len(add_loan_row_datum_1))
+
+        for index, row_data_model in enumerate(row_data_resp):
+            self._validate_response(model=row_data_model, model_data=add_loan_row_datum_1[index])
+
+    def test_AddLoanDataTable_response(self):
+        data_table_resp = AddLoanDataTable(**add_loan_data_table)
+
+        for attr in [AddLoanDataTableKeys.ROWS, AddLoanDataTableKeys.COLS]:
+            self._verify(
+                descript=f"{data_table_resp.model_name}: Has attribute '{attr}'",
+                actual=hasattr(data_table_resp, attr), expected=True)
+
+        self._validate_response(model=data_table_resp, model_data=add_loan_data_table)
+
+    def test_GetLoan_response(self):
+        get_loan_data = response_args.copy()
+        get_loan_data[AddLoanDataTableKeys.DATA_TABLE] = add_loan_data_table
+        get_loan_resp = GetLoan(**get_loan_data)
+
+        attr = AddLoanDataTableKeys.DATA_TABLE
+        self._verify(descript=f"{get_loan_resp.model_name}: has '{attr}'",
+                     actual=hasattr(get_loan_resp, attr), expected=True)
+
+        sub_model = getattr(get_loan_resp, attr)
+        for attr in [AddLoanDataTableKeys.ROWS, AddLoanDataTableKeys.COLS]:
+            self._verify(
+                descript=f"{get_loan_resp.model_name}: has attribute '{attr}'",
+                actual=hasattr(sub_model, attr), expected=True)
+
+        self._validate_response(model=get_loan_resp, model_data=get_loan_data)
+
+    def test_GetLoanDetail_response(self):
+        get_loan_detail_data = response_args.copy()
+        get_loan_detail_data[AddLoanDataTableKeys.DATA_TABLE] = add_loan_data_table
+        get_loan_resp = GetLoanDetail(**get_loan_detail_data)
+
+        # ERROR: Need to address that basic row element is different than add_loan_data table element.
+
+        attr = LoanDetailDataTableKeys.DATA_TABLE
+        self._verify(descript=f"{get_loan_resp.model_name}: has '{attr}'",
+                     actual=hasattr(get_loan_resp, attr), expected=True)
+
+        sub_model = getattr(get_loan_resp, attr)
+        for attr in [LoanDetailDataTableKeys.ROWS, LoanDetailDataTableKeys.COLS]:
+            self._verify(
+                descript=f"{get_loan_resp.model_name}: has attribute '{attr}'",
+                actual=hasattr(sub_model, attr), expected=True)
+
+        self._validate_response(model=get_loan_resp, model_data=get_loan_detail_data)
 
 
 if __name__ == '__main__':

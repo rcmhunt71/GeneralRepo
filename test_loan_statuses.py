@@ -2,7 +2,10 @@ import unittest
 
 from PRICE.loans.models.loan_status import LoanStatusKeys, LoanStatus, LoanStatuses
 from PRICE.loans.responses.get_loan_statuses import GetLoanStatuses
+from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
+
+log = Logger()
 
 # --------------------------------------------------
 #             LOAN STATUS TEST DATA
@@ -36,7 +39,9 @@ class TestLoanStatus(unittest.TestCase, CommonResponseValidations):
     def test_loan_status_model(self):
         loan_status_obj = LoanStatus(**status_data_1)
         for key in status_data_1.keys():
-            self.assertEqual(getattr(loan_status_obj, key), status_data_1[key])
+            self._verify(
+                descript=f"{loan_status_obj.model_name}: '{key}' attributes are identical",
+                actual=getattr(loan_status_obj, key), expected=status_data_1[key])
 
     def test_loan_statuses_model(self):
         loan_statuses_obj = LoanStatuses(*statuses_data)
@@ -44,7 +49,9 @@ class TestLoanStatus(unittest.TestCase, CommonResponseValidations):
 
     def test_get_loan_status_response(self):
         loan_status_resp = GetLoanStatuses(**full_status_data)
-        self.assertTrue(hasattr(loan_status_resp, LoanStatusKeys.LOAN_STATUSES))
+        self._verify(
+            descript=f"{loan_status_resp.model_name}: '{LoanStatusKeys.LOAN_STATUSES}' attribute is defined",
+            actual=hasattr(loan_status_resp, LoanStatusKeys.LOAN_STATUSES), expected=True)
 
         loan_status_model = getattr(loan_status_resp, LoanStatusKeys.LOAN_STATUSES)
 
@@ -54,7 +61,9 @@ class TestLoanStatus(unittest.TestCase, CommonResponseValidations):
     def _validate_loan_model(self, model, keys):
         for elem in range(len(statuses_data)):
             for key in keys:
-                self.assertEqual(getattr(model[elem], key), statuses_data[elem][key])
+                self._verify(
+                    descript=f"{model.model_name} (Element #{elem}): '{key}' attributes are identical",
+                    actual=getattr(model[elem], key), expected=statuses_data[elem][key])
 
 
 if __name__ == "__main__":

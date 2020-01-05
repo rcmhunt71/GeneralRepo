@@ -274,7 +274,7 @@ class Logger:
 
         return self._translate_to_dotted_lib_path(filename)
 
-    def _log_level(self, level: str, msg: str, prefix: str = '') -> None:
+    def _log_at_level(self, level: str, msg: str, prefix: str = '') -> None:
         """
         Determine and use the proper logging level (abstracted to expose logging
         routines at class level; also reduces the dotted path when invoking in
@@ -406,7 +406,7 @@ class Logger:
         :return: None
 
         """
-        self._log_level(level='CRITICAL', msg=msg)
+        self._log_at_level(level='CRITICAL', msg=msg)
 
     def error(self, msg) -> None:
         """
@@ -416,7 +416,7 @@ class Logger:
         :return: None
 
         """
-        self._log_level(level='ERROR', msg=msg)
+        self._log_at_level(level='ERROR', msg=msg)
 
     def warn(self, msg) -> None:
         """
@@ -426,7 +426,7 @@ class Logger:
         :return: None
 
         """
-        self._log_level(level='WARN', msg=msg)
+        self._log_at_level(level='WARN', msg=msg)
 
     def warning(self, msg: str) -> None:
         """
@@ -446,7 +446,7 @@ class Logger:
         :return: None
 
         """
-        self._log_level(level='INFO', msg=msg)
+        self._log_at_level(level='INFO', msg=msg)
 
     def debug(self, msg) -> None:
         """
@@ -456,7 +456,7 @@ class Logger:
         :return: None
 
         """
-        self._log_level(level='DEBUG', msg=msg)
+        self._log_at_level(level='DEBUG', msg=msg)
 
     def exception(self, msg) -> None:
         """
@@ -465,7 +465,7 @@ class Logger:
         :return: None
 
         """
-        self._log_level(level='EXCEPTION', msg=msg)
+        self._log_at_level(level='EXCEPTION', msg=msg)
 
 
 # FOR VISUAL/MANUAL TESTING PURPOSES

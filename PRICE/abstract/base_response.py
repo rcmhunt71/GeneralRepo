@@ -54,8 +54,9 @@ class BaseResponse:
             if keyword in self._VARS or keyword in self._OBJS:
                 setattr(self, keyword, value)
             else:
-                print(f"Unrecognized argument for {self.__class__.__name__}: "
-                      f"{keyword} --> Value: {value}")
+                quote = "'" if isinstance(value, str) else ''
+                print(f"Unrecognized argument for '{self.__class__.__name__}': "
+                      f"Keyword: '{keyword}' --> Value: {quote}{value}{quote}")
 
     def to_struct(self):
         return dict([(attr, getattr(self, attr)) for attr in self._VARS])

@@ -5,7 +5,10 @@ from PRICE.assets.models.assets import AssetsKeys, Assets
 from PRICE.assets.models.automobile import AutomobileKeys
 from PRICE.assets.responses.add_automobile import AddAutomobileResponse
 from PRICE.assets.responses.get_assets import AssetsResponse
+from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
+
+log = Logger()
 
 # ---------------------------------------------------------------
 #     ASSET TEST DATA
@@ -49,8 +52,7 @@ assets_list = [asset_1, asset_2]
 class TestAssets(unittest.TestCase, CommonResponseValidations):
     def test_asset_model(self):
         asset_obj = Asset(**asset_1)
-        for key in asset_1.keys():
-            self.assertEqual(getattr(asset_obj, key), asset_1[key])
+        self._validate_response(model=asset_obj, model_data=asset_1)
 
     def test_assets_model(self):
         self._test_assets_model(model=Assets(*assets_list), keys=asset_1.keys())
@@ -60,7 +62,9 @@ class TestAssets(unittest.TestCase, CommonResponseValidations):
         assets_args[AssetsKeys.ASSETS] = assets_list
         assets_list_resp = AssetsResponse(**assets_args)
 
-        self.assertTrue(hasattr(assets_list_resp, AssetsKeys.ASSETS))
+        self._verify(
+            descript=f"{assets_list_resp}: Has {AssetsKeys.ASSETS}",
+            actual=hasattr(assets_list_resp, AssetsKeys.ASSETS), expected=True)
 
         model = getattr(assets_list_resp, AssetsKeys.ASSETS)
         self._test_assets_model(model=model, keys=asset_1.keys())
@@ -79,7 +83,9 @@ class TestAssets(unittest.TestCase, CommonResponseValidations):
         self.assertEqual(len(assets_list), len(model))
         for index, asset in enumerate(assets_list):
             for key in keys:
-                self.assertEqual(getattr(model[index], key), assets_list[index][key])
+                self._verify(
+                    descript=f"{model[index].model_name} - Element #{index}: '{key}' are equal",
+                    actual=getattr(model[index], key), expected=assets_list[index][key])
 
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ class CommonResponseValidations:
     # Class cannot be instantiated on it's own. This is multi-inheritance utility class that requires
     # co-inheritance with unittest.TestCase to function.
 
-    def _validate_response(self, model, model_data, debug=False):
+    def _validate_response(self, model, model_data):
 
         # Only get keys with primitive values (no complex structures or objects)
         attrs = [key for key, value in model_data.items() if
@@ -47,6 +47,17 @@ class CommonResponseValidations:
         for attr in attrs:
             model_value = getattr(model, attr)
             data_value = model_data[attr]
-            log.debug(f"Validation Assertion: {model.model_name}.{attr}: model==data ? "
-                      f"('{model_value}' == '{data_value}') => {model_value == data_value}")
+            quote = "'" if isinstance(data_value, str) else ''
+            log.debug(f"Validation Assertion: {model.model_name}.{attr} --> model==data ? "
+                      f"({quote}{model_value}{quote} == {quote}{data_value}{quote}) => {model_value == data_value}")
             self.assertEqual(model_value, data_value)
+
+    def _verify(self, descript, actual, expected):
+        quote = "'" if isinstance(actual, str) else ''
+        log.debug(f"Validation Assertion: {descript} ? "
+                  f"({quote}{actual}{quote} == {quote}{expected}{quote}) => {actual == expected}")
+
+        if isinstance(actual, list):
+            self.assertListEqual(actual, expected)
+        else:
+            self.assertEqual(actual, expected)

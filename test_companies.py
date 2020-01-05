@@ -6,7 +6,10 @@ from PRICE.company.models.company import CompanyKeys, Company
 from PRICE.company.responses.add_company import AddCompanyResponse
 from PRICE.company.responses.get_companies import GetCompaniesResponse
 from PRICE.company.responses.get_company_ids import GetCompanyIDsResponse, GetCompanyIDsKeys
+from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
+
+log = Logger()
 
 # ---------------------------------------------------------------
 #            COMPANY TEST DATA
@@ -58,7 +61,10 @@ class TestCompany(unittest.TestCase, CommonResponseValidations):
         companies_model = Companies(*companies_list)
 
         # Verify model has correct number of elements and corresponding data
-        self.assertEqual(len(companies_list), len(companies_model))
+        self._verify(
+            descript=f"{companies_model.model_name}: Company lists are identical",
+            actual=len(companies_list), expected=len(companies_model))
+
         for index, data_model in enumerate(companies_list):
             self._validate_response(model=companies_model[index], model_data=data_model)
 
@@ -75,9 +81,14 @@ class TestCompany(unittest.TestCase, CommonResponseValidations):
         companies_resp = GetCompaniesResponse(**get_company_args)
 
         # Verify common response has CompaniesKeys.COMPANIES attribute
-        self.assertTrue(hasattr(companies_resp, CompaniesKeys.COMPANIES))
-        self.assertEqual(len(getattr(companies_resp, CompaniesKeys.COMPANIES)),
-                         len(companies_list))
+        self._verify(
+            descript=f"{companies_resp.model_name}: Model has '{CompaniesKeys.COMPANIES}' attribute",
+            actual=hasattr(companies_resp, CompaniesKeys.COMPANIES), expected=True)
+
+        self._verify(
+            descript=f"{companies_resp.model_name}: Company lists are identical",
+            actual=len(getattr(companies_resp, CompaniesKeys.COMPANIES)),
+            expected=len(companies_list))
 
         # Verify CompaniesKeys.COMPANIES attribute contains correct data
         for index, company_model in enumerate(getattr(companies_resp, CompaniesKeys.COMPANIES)):
@@ -92,7 +103,10 @@ class TestCompany(unittest.TestCase, CommonResponseValidations):
         company_ids_response = GetCompanyIDsResponse(**company_ids_args)
 
         # Verify CompaniesKeys.COMPANY_IDs attribute contains correct data
-        self.assertListEqual(getattr(company_ids_response, GetCompanyIDsKeys.COMPANY_IDS), company_ids_list)
+        self._verify(
+            descript=f"{company_ids_response.model_name}: Company id lists are identical",
+            actual=getattr(company_ids_response, GetCompanyIDsKeys.COMPANY_IDS),
+            expected=company_ids_list)
 
         # Verify common response portion of response has correct data
         self._validate_response(model=company_ids_response, model_data=company_ids_args)

@@ -41,7 +41,11 @@ class TestRateQuote(unittest.TestCase, CommonResponseValidations):
 
     def _validate_model(self, model, keys):
         for key in keys:
-            self.assertEqual(getattr(model, key), rate_quote[key])
+            self._verify(
+                descript=f"{model.model_name}: '{key}' values are equal",
+                actual=getattr(model, key), expected=rate_quote[key])
+
+            # self.assertEqual(getattr(model, key), rate_quote[key])
 
 
 if __name__ == '__main__':

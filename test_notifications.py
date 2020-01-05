@@ -27,7 +27,9 @@ class TestEmailAPIs(unittest.TestCase, CommonResponseValidations):
         email_merge_resp = MergeEmailTemplate(**merge_data)
 
         for attr in email_status.keys():
-            self.assertEqual(getattr(email_merge_resp, attr), email_status[attr])
+            self._verify(
+                descript=f"{email_merge_resp.model_name}: '{attr}' are identical",
+                actual=getattr(email_merge_resp, attr), expected=email_status[attr])
         self._validate_response(model=email_merge_resp, model_data=merge_data)
 
     def test_SendEmailAndMakeConvLog_response(self):
@@ -37,7 +39,9 @@ class TestEmailAPIs(unittest.TestCase, CommonResponseValidations):
         send_email_resp = SendEmailAndMakeConvLog(**merge_data)
 
         for attr in email_memo_id.keys():
-            self.assertEqual(getattr(send_email_resp, attr), email_memo_id[attr])
+            self._verify(
+                descript=f"{send_email_resp.model_name}: '{attr}' are identical",
+                actual=getattr(send_email_resp, attr), expected=email_memo_id[attr])
         self._validate_response(model=send_email_resp, model_data=merge_data)
 
 
