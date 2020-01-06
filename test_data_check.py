@@ -42,7 +42,7 @@ class TestDataCheck(unittest.TestCase, CommonResponseValidations):
         for sub_model, model_data in zip(data_checks_model, data_check_bundle_args):
             self._validate_response(model=sub_model, model_data=model_data)
 
-    def test_evaulate_data_checks_response(self):
+    def test_evaluate_data_checks_response(self):
         attr = EvaluateDataCheckBundleKeys.DATA_CHECKS
 
         data_args = response_args.copy()
