@@ -42,6 +42,11 @@ class CommonResponseValidations:
                  (isinstance(value, str) or isinstance(value, int) or value is None)]
 
         log.debug(f"Attributes in model_data with primitives: {attrs}")
+        try:
+            log.debug(f"Model '{model.model_name}.__str__()':\n{model}")
+        except AttributeError:
+            # Squash attribute issues when rendering as __str__() until it can be fixed.
+            pass
 
         # Verify object data matches configured data
         for attr in attrs:
