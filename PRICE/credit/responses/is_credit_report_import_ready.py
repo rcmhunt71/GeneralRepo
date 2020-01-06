@@ -3,6 +3,5 @@ from PRICE.credit.models.credit_report_import_ready import CreditReportImportRea
 
 
 class CreditReportImportReady(CommonResponse):
-    def __init__(self, **kwargs):
-        self._VARS = [CreditReportImportReadyKeys.READY_TO_IMPORT]
-        super().__init__(keys=self._VARS, **kwargs)
+    ADD_KEYS = [CreditReportImportReadyKeys.READY_TO_IMPORT]
+    SUB_MODELS = [None]

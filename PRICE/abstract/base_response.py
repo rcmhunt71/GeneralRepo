@@ -24,7 +24,9 @@ class BaseResponse:
 
         self._combine_args(keys=keys, objs=objs)
         log.debug(f"COMBINED PARAMETERS:\n\tself._VARS: {self._VARS}\n\tself._OBJS: {self._OBJS}")
+        log.debug(f"ORIGINAL KWARGS:\n{pprint.pformat(kwargs)}\n")
 
+        updated_kwargs = False
         if self.ADD_KEYS is not None:
             # If only adding KEYS & no MODELS (nested sub-objects), create a list of NONE models
             if self.SUB_MODELS is None:
@@ -43,13 +45,17 @@ class BaseResponse:
                 if key in kwargs and kwargs.get(key) is not None:
                     if model is not None:
                         data = kwargs.get(key)
+                        log.debug(f"Building '{model}' with {data}")
                         kwargs[key] = model(*data) if isinstance(data, list) else model(**data)
                         self._OBJS.append(key)
+                        updated_kwargs = True
                     else:
                         self._VARS.append(key)
 
         # Add each sub_model object or keyword to the base model object, based on what is in the **kwargs dict.
-        log.debug(f"Updated KWARGS:\n{pprint.pformat(kwargs)}\n")
+        if updated_kwargs:
+            log.debug(f"Updated KWARGS:\n{pprint.pformat(kwargs)}\n")
+
         for keyword, value in kwargs.items():
             if keyword in self._VARS or keyword in self._OBJS:
                 setattr(self, keyword, value)
