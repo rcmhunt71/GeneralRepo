@@ -64,9 +64,6 @@ class BaseResponse:
                 print(f"Unrecognized argument for '{self.__class__.__name__}': "
                       f"Keyword: '{keyword}' --> Value: {quote}{value}{quote}")
 
-    def to_struct(self):
-        return dict([(attr, getattr(self, attr)) for attr in self._VARS])
-
     def _combine_args(self, keys=None, objs=None):
         if keys is not None:
             self._VARS.extend(keys)
@@ -77,7 +74,7 @@ class BaseResponse:
             self._OBJS = list(set(self._OBJS))
 
     def __str__(self):
-        return pprint.pformat(self.to_struct())
+        return pprint.pformat(self.raw)
 
 
 class BaseListResponse(list):
@@ -86,14 +83,10 @@ class BaseListResponse(list):
     def __init__(self, *arg_list):
         super().__init__()
         self.model_name = self.__class__.__name__
+        self.raw = arg_list
 
         log.debug(f"KWARGS:\n{pprint.pformat(arg_list)}\n")
-        self.raw = arg_list
         self.extend([self.SUB_MODEL(**value_dict) for value_dict in arg_list])
 
-    def to_struct(self):
-        return [elem.to_struct() for elem in self]
-
     def __str__(self):
-        output = "\n ".join([str(elem.to_struct()) for elem in self])
-        return f"[{output}]"
+        return pprint.pformat(self.raw)
