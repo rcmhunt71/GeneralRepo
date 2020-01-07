@@ -1,4 +1,5 @@
 import unittest
+from random import randrange, choice
 
 from PRICE.assets.models.asset import AssetKeys, Asset
 from PRICE.assets.models.assets import AssetsKeys, Assets
@@ -10,40 +11,32 @@ from PRICE.tests.common_response_args import CommonResponseValidations, response
 
 log = Logger()
 
+
 # ---------------------------------------------------------------
 #     ASSET TEST DATA
 # ---------------------------------------------------------------
-asset_1 = {
-    AssetKeys.CUSTOMER_ID: 123456,
-    AssetKeys.ASSET_ID: "A-123456",
-    AssetKeys.ASSET_NAME: "TestAsset1",
-    AssetKeys.ASSET_TYPE: "Test",
-    AssetKeys.MARKET_VALUE: "10000",
-    AssetKeys.FIX_DESCRIPTION: "Broken",
-    AssetKeys.INSURANCE_FACE_VALUE: "10000",
-    AssetKeys.VERIFY: True,
-    AssetKeys.VERIFY_DATE: "20200101",
-    AssetKeys.BOTH: True,
-    AssetKeys.LIQUID: False,
-    AssetKeys.RETIREMENT_FUND_DETAIL: "Blah Blah Blah",
-}
+booleans = [True, False]
+details = ['Yadda', 'Blah', 'Nope']
+number_of_assets = 3
 
-asset_2 = {
-    AssetKeys.CUSTOMER_ID: 987654,
-    AssetKeys.ASSET_ID: "A-987654",
-    AssetKeys.ASSET_NAME: "TestAsset2",
-    AssetKeys.ASSET_TYPE: "Test1",
-    AssetKeys.MARKET_VALUE: "1000000",
-    AssetKeys.FIX_DESCRIPTION: "FIXED",
-    AssetKeys.INSURANCE_FACE_VALUE: "1000000",
-    AssetKeys.VERIFY: False,
-    AssetKeys.VERIFY_DATE: "20000101",
-    AssetKeys.BOTH: False,
-    AssetKeys.LIQUID: True,
-    AssetKeys.RETIREMENT_FUND_DETAIL: "Yadda Yadda Yadda",
-}
 
-assets_list = [asset_1, asset_2]
+def build_asset():
+    return {
+        AssetKeys.CUSTOMER_ID: randrange(999999),
+        AssetKeys.ASSET_ID: f"A-{randrange(999999)}",
+        AssetKeys.ASSET_NAME: f"TestAsset_{randrange(9)}",
+        AssetKeys.ASSET_TYPE: "Test",
+        AssetKeys.MARKET_VALUE: f"{randrange(99999)}",
+        AssetKeys.FIX_DESCRIPTION: "Broken",
+        AssetKeys.INSURANCE_FACE_VALUE: f"{randrange(99999)}",
+        AssetKeys.VERIFY: choice(booleans),
+        AssetKeys.VERIFY_DATE: f"{randrange(1990, 2019)}{randrange(1,12):02}{randrange(1,28):02}",
+        AssetKeys.BOTH: choice(booleans),
+        AssetKeys.LIQUID: choice(booleans),
+        AssetKeys.RETIREMENT_FUND_DETAIL: "{0}-{0}-{0}".format(choice(details))}
+
+
+assets_list = [build_asset() for _ in range(number_of_assets)]
 
 
 # ---------------------------------------------------------------
@@ -51,11 +44,11 @@ assets_list = [asset_1, asset_2]
 # ---------------------------------------------------------------
 class TestAssets(unittest.TestCase, CommonResponseValidations):
     def test_asset_model(self):
-        asset_obj = Asset(**asset_1)
-        self._validate_response(model=asset_obj, model_data=asset_1)
+        asset_obj = Asset(**assets_list[0])
+        self._validate_response(model=asset_obj, model_data=assets_list[0])
 
     def test_assets_model(self):
-        self._test_assets_model(model=Assets(*assets_list), keys=asset_1.keys())
+        self._test_assets_model(model=Assets(*assets_list), keys=assets_list[0].keys())
 
     def test_assets_response(self):
         assets_args = response_args.copy()
@@ -67,14 +60,14 @@ class TestAssets(unittest.TestCase, CommonResponseValidations):
             actual=hasattr(assets_list_resp, AssetsKeys.ASSETS), expected=True)
 
         model = getattr(assets_list_resp, AssetsKeys.ASSETS)
-        self._test_assets_model(model=model, keys=asset_1.keys())
+        self._test_assets_model(model=model, keys=assets_list[0].keys())
         self._validate_response(model=assets_list_resp, model_data=assets_args)
 
     def test_automobile_response(self):
         key = AutomobileKeys.AUTOMOBILE_ID
 
         automobile_args = response_args.copy()
-        automobile_args[key] = "CAR-123"
+        automobile_args[key] = f"CAR-{randrange(999):03}"
         auto = AddAutomobileResponse(**automobile_args)
 
         self._validate_response(model=auto, model_data=automobile_args)
