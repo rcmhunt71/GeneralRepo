@@ -11,7 +11,7 @@ from PRICE.tests.common_response_args import CommonResponseValidations, response
 process_string_data = {
     ProcessStringKeys.DL_RESULT: "5345 Kietze Lane",
     ProcessStringKeys.LOAN_NUMBER_ID: 5538467,
-    ProcessStringKeys.DATA_LANGUAGE: "(ihInfo(Elmpoyee,Loan_Officer_Id,GetFullAddress))"
+    ProcessStringKeys.DATA_LANGUAGE: "(ihInfo(Employee,Loan_Officer_Id,GetFullAddress))"
 }
 
 parameter_keys_data = {

@@ -42,25 +42,21 @@ for arg, data_list in fv_data:
 # ================================================================
 #     Build Add Loan Column Data
 # ================================================================
-add_loan_data_column_args_1 = {
-    AddLoanDataColEntryKeys.ID: "Loan_Number_ID",
-    AddLoanDataColEntryKeys.LABEL: "Loan Number ID",
-    AddLoanDataColEntryKeys.TYPE: "number",
-}
+column_headers = (("Loan_Number_ID", "Loan Number ID", "number"),
+                  ("Status_ID", "Status ID", "number"),
+                  ("Owner_Name", "Owner Name", "string"))
 
-add_loan_data_column_args_2 = {
-    AddLoanDataColEntryKeys.ID: "Status_ID",
-    AddLoanDataColEntryKeys.LABEL: "Status ID",
-    AddLoanDataColEntryKeys.TYPE: "number",
-}
 
-add_loan_data_column_args_3 = {
-    AddLoanDataColEntryKeys.ID: "Owner_Name",
-    AddLoanDataColEntryKeys.LABEL: "Owner Name",
-    AddLoanDataColEntryKeys.TYPE: "string",
-}
+def build_add_loan_data_column(data_tuple):
+    return {
+        AddLoanDataColEntryKeys.ID: data_tuple[0],
+        AddLoanDataColEntryKeys.LABEL: data_tuple[1],
+        AddLoanDataColEntryKeys.TYPE: data_tuple[2],
+    }
 
-add_loan_data_columns_list = [add_loan_data_column_args_3, add_loan_data_column_args_1, add_loan_data_column_args_2]
+
+add_loan_data_columns_list = [build_add_loan_data_column(data) for data in column_headers]
+
 
 add_loan_value_entry_1 = {AddLoanRowValueKeys.VALUE: "Bobby McFerrin"}
 add_loan_value_entry_2 = {AddLoanRowValueKeys.VALUE: 1}
@@ -86,6 +82,35 @@ add_loan_row_datum_1 = [add_loan_col_value_dict_1, add_loan_col_value_dict_2, ad
 
 add_loan_data_table = {AddLoanDataTableKeys.COLS: add_loan_data_columns_list,
                        AddLoanDataTableKeys.ROWS: add_loan_row_datum_1}
+
+
+# LOAN DETAILS
+# TODO Need to finish building out data source for GetLoanDetails()
+
+loan_detail_value_entry_1 = {AddLoanRowValueKeys.VALUE: "Bobby McFerrin"}
+loan_detail_value_entry_2 = {AddLoanRowValueKeys.VALUE: 1}
+loan_detail_value_entry_3 = {AddLoanRowValueKeys.VALUE: 10}
+
+loan_detail_value_entry_4 = {AddLoanRowValueKeys.VALUE: "George Burns"}
+loan_detail_value_entry_5 = {AddLoanRowValueKeys.VALUE: 2}
+loan_detail_value_entry_6 = {AddLoanRowValueKeys.VALUE: 20}
+
+loan_detail_value_entry_7 = {AddLoanRowValueKeys.VALUE: "Goose"}
+loan_detail_value_entry_8 = {AddLoanRowValueKeys.VALUE: 3}
+loan_detail_value_entry_9 = {AddLoanRowValueKeys.VALUE: 30}
+
+loan_detail_col_values_list_1 = [loan_detail_value_entry_1, loan_detail_value_entry_2, loan_detail_value_entry_3]
+loan_detail_col_values_list_2 = [loan_detail_value_entry_4, loan_detail_value_entry_5, loan_detail_value_entry_6]
+loan_detail_col_values_list_3 = [loan_detail_value_entry_7, loan_detail_value_entry_8, loan_detail_value_entry_9]
+
+loan_detail_col_value_dict_1 = {AddLoanRowColKeys.COL: loan_detail_col_values_list_1}
+loan_detail_col_value_dict_2 = {AddLoanRowColKeys.COL: loan_detail_col_values_list_2}
+loan_detail_col_value_dict_3 = {AddLoanRowColKeys.COL: loan_detail_col_values_list_3}
+
+loan_detail_row_datum_1 = [loan_detail_col_value_dict_1, loan_detail_col_value_dict_2, loan_detail_col_value_dict_3]
+
+loan_detail_data_table = {AddLoanDataTableKeys.COLS: add_loan_data_columns_list,
+                          AddLoanDataTableKeys.ROWS: loan_detail_row_datum_1}
 
 
 # ---------------------------------------------------------------
@@ -135,8 +160,9 @@ class TestGetFinalValueTags(unittest.TestCase, CommonResponseValidations):
 
 class TestAddLoanData(unittest.TestCase, CommonResponseValidations):
     def test_AddLoanDataColEntry_model(self):
-        data_col_resp = AddLoanDataColEntry(**add_loan_data_column_args_1)
-        self._validate_response(model=data_col_resp, model_data=add_loan_data_column_args_1)
+        index = 0
+        data_col_resp = AddLoanDataColEntry(**add_loan_data_columns_list[index])
+        self._validate_response(model=data_col_resp, model_data=add_loan_data_columns_list[index])
 
     def test_AddLoanDataCols_model(self):
         dc_cols_resp = AddLoanDataCols(*add_loan_data_columns_list)

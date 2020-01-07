@@ -1,37 +1,33 @@
 import unittest
+from random import randrange, choice
 
 from PRICE.data_check.models.datacheck import DataCheckKeys, DataCheck, DataChecks, EvaluateDataCheckBundleKeys
 from PRICE.data_check.responses.evaluate_data_check_bundle import EvaluateDataCheckBundle
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
-data_check_args_1 = {
-    DataCheckKeys.DATA_CHECK_ID: 25,
-    DataCheckKeys.NAME: "Loan Number",
-    DataCheckKeys.DESCRIPTION: 'The Loan Number "1337" is valid',
-    DataCheckKeys.RESULT: "Pass"
-}
+number_of_bundles = 3
+names = ["Loan Number", "Invoice Number", "Customer ID"]
+is_valid = ['valid', 'invalid']
+results = ['Pass', 'Fail']
 
-data_check_args_2 = {
-    DataCheckKeys.DATA_CHECK_ID: 50,
-    DataCheckKeys.NAME: "Invoice Number",
-    DataCheckKeys.DESCRIPTION: 'The Invoice Number "8856" is invalid',
-    DataCheckKeys.RESULT: "Fail"
-}
 
-data_check_args_3 = {
-    DataCheckKeys.DATA_CHECK_ID: 75,
-    DataCheckKeys.NAME: "Customer ID",
-    DataCheckKeys.DESCRIPTION: 'The Customer ID is "L337" is valid',
-    DataCheckKeys.RESULT: "Pass"
-}
+def build_data_check_data():
+    return {
+        DataCheckKeys.DATA_CHECK_ID: randrange(1, 99),
+        DataCheckKeys.NAME: choice(names),
+        DataCheckKeys.DESCRIPTION: f'The Loan Number "{randrange(1, 9999):04}" is {choice(is_valid)}',
+        DataCheckKeys.RESULT: choice(results)
+    }
 
-data_check_bundle_args = [data_check_args_1, data_check_args_2, data_check_args_3]
+
+data_check_bundle_args = [build_data_check_data() for _ in range(number_of_bundles)]
 
 
 class TestDataCheck(unittest.TestCase, CommonResponseValidations):
     def test_data_check_model(self):
-        data_check_model = DataCheck(**data_check_args_1)
-        self._validate_response(model=data_check_model, model_data=data_check_args_1)
+        index = randrange(1, number_of_bundles)
+        data_check_model = DataCheck(**data_check_bundle_args[index])
+        self._validate_response(model=data_check_model, model_data=data_check_bundle_args[index])
 
     def test_data_checks_model(self):
         data_checks_model = DataChecks(*data_check_bundle_args)
