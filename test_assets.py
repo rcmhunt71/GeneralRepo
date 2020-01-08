@@ -1,11 +1,11 @@
 import unittest
 from random import randrange, choice
 
-from PRICE.assets.models.asset import AssetKeys, Asset
-from PRICE.assets.models.assets import AssetsKeys, Assets
-from PRICE.assets.models.automobile import AutomobileKeys
-from PRICE.assets.responses.add_automobile import AddAutomobileResponse
-from PRICE.assets.responses.get_assets import AssetsResponse
+from APIs.assets.models.asset import AssetKeys, Asset
+from APIs.assets.models.assets import AssetsKeys, Assets
+from APIs.assets.models.automobile import AutomobileKeys
+from APIs.assets.responses.add_automobile import AddAutomobileResponse
+from APIs.assets.responses.get_assets import AssetsResponse
 from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 

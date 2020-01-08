@@ -1,14 +1,14 @@
 import unittest
 
-from PRICE.loans.models.add_loan_data import (
+from APIs.loans.models.add_loan_data import (
     AddLoanDataColEntryKeys, AddLoanRowValueKeys, AddLoanDataTableKeys, AddLoanDataColEntry, AddLoanDataCols,
     AddLoanValueEntry, AddLoanRowColsValue, AddLoanRowColKeys, AddLoanRowEntry, AddLoanRowList, AddLoanDataTable)
-from PRICE.loans.models.final_value import FinalValueFieldsKeys, FinalValueScreenKeys
-from PRICE.loans.models.loan_detail_data import LoanDetailDataTableKeys
-from PRICE.loans.responses.add_loan import AddLoanKeys, AddLoan
-from PRICE.loans.responses.get_final_value_tags import GetFinalValueTags
-from PRICE.loans.responses.get_loan import GetLoan
-from PRICE.loans.responses.get_loan_detail import GetLoanDetail
+from APIs.loans.models.final_value import FinalValueFieldsKeys, FinalValueScreenKeys
+from APIs.loans.models.loan_detail_data import LoanDetailDataTableKeys
+from APIs.loans.responses.add_loan import AddLoanKeys, AddLoan
+from APIs.loans.responses.get_final_value_tags import GetFinalValueTags
+from APIs.loans.responses.get_loan import GetLoan
+from APIs.loans.responses.get_loan_detail import GetLoanDetail
 from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 

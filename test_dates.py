@@ -1,8 +1,8 @@
 import unittest
 from random import choice, randrange
 
-from PRICE.dates.models.dates import DateKeys, DateEntry, DatesList, DatesListKeys
-from PRICE.dates.responses.get_dates import GetDates
+from APIs.dates.models.dates import DateKeys, DateEntry, DatesList, DatesListKeys
+from APIs.dates.responses.get_dates import GetDates
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
 number_dates = 3
@@ -11,8 +11,8 @@ status = ["Received", "Denied"]
 
 def build_date_data():
     return {
-        DateKeys.DATE_VALUE: f"{randrange(2005, 2018)}-{randrange(1-12):02}-{randrange(1-28):02}T"
-                             f"{randrange(0-24):02}:{randrange(0, 60):02}:{randrange(0, 60)}.{randrange(999):03}",
+        DateKeys.DATE_VALUE: f"{randrange(2005, 2018)}-{randrange(1, 12):02}-{randrange(1, 28):02}T"
+                             f"{randrange(0, 24):02}:{randrange(0, 60):02}:{randrange(0, 60)}.{randrange(999):03}",
         DateKeys.DATE_NAME: f"Application {choice(status)}",
     }
 

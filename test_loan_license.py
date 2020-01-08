@@ -1,8 +1,8 @@
 import unittest
 from random import choice, randrange
 
-from PRICE.loans.models.license_data import License, LicenseInfoKeys, Licenses, LicenseDataKeys
-from PRICE.loans.responses.get_loan_license_data import GetLoanLicenseData
+from APIs.loans.models.license_data import License, LicenseInfoKeys, Licenses, LicenseDataKeys
+from APIs.loans.responses.get_loan_license_data import GetLoanLicenseData
 from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 

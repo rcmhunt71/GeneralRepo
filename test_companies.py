@@ -1,11 +1,11 @@
 import unittest
 from random import choice, randrange
 
-from PRICE.company.models.companies import CompaniesKeys, Companies
-from PRICE.company.models.company import CompanyKeys, Company
-from PRICE.company.responses.add_company import AddCompanyResponse
-from PRICE.company.responses.get_companies import GetCompaniesResponse
-from PRICE.company.responses.get_company_ids import GetCompanyIDsResponse, GetCompanyIDsKeys
+from APIs.company.models.companies import CompaniesKeys, Companies
+from APIs.company.models.company import CompanyKeys, Company
+from APIs.company.responses.add_company import AddCompanyResponse
+from APIs.company.responses.get_companies import GetCompaniesResponse
+from APIs.company.responses.get_company_ids import GetCompanyIDsResponse, GetCompanyIDsKeys
 from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 

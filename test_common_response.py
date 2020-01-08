@@ -1,9 +1,9 @@
 import unittest
 
-from PRICE.common.models.stats import StatsModel
-from PRICE.common.models.version import VersionModel
-from PRICE.common.response import CommonResponse
 from PRICE.tests.common_response_args import response_args, version_args, stats_args, CommonResponseValidations
+from base.common.models.stats import StatsModel
+from base.common.models.version import VersionModel
+from base.common.response import CommonResponse
 
 
 # ---------------------------------------------------------------

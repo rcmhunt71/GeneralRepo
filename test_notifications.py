@@ -1,8 +1,8 @@
 import unittest
 
-from PRICE.notification.models.email import EmailMergeKeys, EmailConvLogKeys
-from PRICE.notification.responses.merge_email_template import MergeEmailTemplate
-from PRICE.notification.responses.send_email_and_make_conv_log import SendEmailAndMakeConvLog
+from APIs.notification.models.email import EmailMergeKeys, EmailConvLogKeys
+from APIs.notification.responses.merge_email_template import MergeEmailTemplate
+from APIs.notification.responses.send_email_and_make_conv_log import SendEmailAndMakeConvLog
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
 # --------------------------------------------------

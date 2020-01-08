@@ -1,7 +1,7 @@
-from PRICE.common.models.stats import StatsKeys
-from PRICE.common.models.version import VersionKeys
-from PRICE.common.response import CommonResponseKeys
 from PRICE.logger.logging import Logger
+from base.common.models.stats import StatsKeys
+from base.common.models.version import VersionKeys
+from base.common.response import CommonResponseKeys
 
 log = Logger()
 

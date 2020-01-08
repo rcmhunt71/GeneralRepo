@@ -1,8 +1,8 @@
 import unittest
 from random import randrange, choice
 
-from PRICE.data_check.models.datacheck import DataCheckKeys, DataCheck, DataChecks, EvaluateDataCheckBundleKeys
-from PRICE.data_check.responses.evaluate_data_check_bundle import EvaluateDataCheckBundle
+from APIs.data_check.models.datacheck import DataCheckKeys, DataCheck, DataChecks, EvaluateDataCheckBundleKeys
+from APIs.data_check.responses.evaluate_data_check_bundle import EvaluateDataCheckBundle
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
 number_of_bundles = 3

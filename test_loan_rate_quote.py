@@ -1,7 +1,7 @@
 import unittest
 
-from PRICE.loans.models.rate_quote_details import RateQuoteDetailsInfoKeys
-from PRICE.loans.responses.get_loan_rate_quote_details import GetLoanRateQuoteDetails
+from APIs.loans.models.rate_quote_details import RateQuoteDetailsInfoKeys
+from APIs.loans.responses.get_loan_rate_quote_details import GetLoanRateQuoteDetails
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
 # --------------------------------------------------

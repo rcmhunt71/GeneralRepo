@@ -1,8 +1,8 @@
 import unittest
 from random import randrange, choice
 
-from PRICE.loans.models.loan_status import LoanStatusKeys, LoanStatus, LoanStatuses
-from PRICE.loans.responses.get_loan_statuses import GetLoanStatuses
+from APIs.loans.models.loan_status import LoanStatusKeys, LoanStatus, LoanStatuses
+from APIs.loans.responses.get_loan_statuses import GetLoanStatuses
 from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 

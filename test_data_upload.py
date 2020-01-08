@@ -1,11 +1,11 @@
 import unittest
 
-from PRICE.data_upload.models.process_string import ProcessStringKeys
-from PRICE.data_upload.models.register_parameter_set import RegisterParameterSetKeys
-from PRICE.data_upload.models.upload_data import UploadDataKeys
-from PRICE.data_upload.responses.process_string import ProcessString
-from PRICE.data_upload.responses.register_parameter_set import RegisterParameterSet
-from PRICE.data_upload.responses.upload_data import UploadData
+from APIs.data_upload.models.process_string import ProcessStringKeys
+from APIs.data_upload.models.register_parameter_set import RegisterParameterSetKeys
+from APIs.data_upload.models.upload_data import UploadDataKeys
+from APIs.data_upload.responses.process_string import ProcessString
+from APIs.data_upload.responses.register_parameter_set import RegisterParameterSet
+from APIs.data_upload.responses.upload_data import UploadData
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
 process_string_data = {

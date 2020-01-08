@@ -1,15 +1,15 @@
 import unittest
 from random import randrange, choice
 
-from PRICE.deposit.models.add_deposit import AddDepositKeys
-from PRICE.deposit.models.deposit import DepositKeys, Deposit, DepositsKeys, Deposits
-from PRICE.deposit.models.deposit_account import (DepositAccountKeys, DepositAccount,
-                                                  DepositAccounts, DepositAccountsKeys,
-                                                  DepositAccountsFieldsKeys, DepositAccountFieldEntry,
-                                                  DepositAccountFieldList, DepositAccountRequestModel)
-from PRICE.deposit.responses.add_deposit import AddDeposit
-from PRICE.deposit.responses.get_deposit_accounts import GetDepositAccounts
-from PRICE.deposit.responses.get_deposits import GetDeposits
+from APIs.deposit.models.add_deposit import AddDepositKeys
+from APIs.deposit.models.deposit import DepositKeys, Deposit, DepositsKeys, Deposits
+from APIs.deposit.models.deposit_account import (DepositAccountKeys, DepositAccount,
+                                                 DepositAccounts, DepositAccountsKeys,
+                                                 DepositAccountsFieldsKeys, DepositAccountFieldEntry,
+                                                 DepositAccountFieldList, DepositAccountRequestModel)
+from APIs.deposit.responses.add_deposit import AddDeposit
+from APIs.deposit.responses.get_deposit_accounts import GetDepositAccounts
+from APIs.deposit.responses.get_deposits import GetDeposits
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
 YES_NO = ["Yes", "No"]
