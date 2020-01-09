@@ -83,7 +83,7 @@ class BaseListResponse(list):
     def __init__(self, *arg_list):
         super().__init__()
         self.model_name = self.__class__.__name__
-        self.raw = arg_list
+        self.raw = arg_list[::]
 
         log.debug(f"KWARGS:\n{pprint.pformat(arg_list)}\n")
         self.extend([self.SUB_MODEL(**value_dict) for value_dict in arg_list])
