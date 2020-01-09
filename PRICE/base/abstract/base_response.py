@@ -17,7 +17,7 @@ class BaseResponse:
     def __init__(self, keys=None, objs=None, **kwargs):
         self._VARS = []
         self._OBJS = []
-        self.raw = kwargs
+        self.raw = kwargs.copy()
         self.model_name = self.__class__.__name__
 
         log.debug(f"Instantiating '{self.model_name}'")
