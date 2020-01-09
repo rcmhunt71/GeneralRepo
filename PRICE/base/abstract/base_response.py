@@ -6,8 +6,7 @@ log = Logger(added_depth=1)
 
 
 class ModelKeyMismatch(Exception):
-    def __init__(self):
-        pass
+    pass
 
 
 class BaseResponse:
