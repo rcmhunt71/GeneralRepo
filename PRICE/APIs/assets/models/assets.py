@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from APIs.assets.models.asset import Asset
-from base.abstract.base_response import BaseListResponse
+from PRICE.APIs.assets.models.asset import Asset
+from PRICE.base.abstract.base_response import BaseListResponse
 
 
 @dataclass

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from base.abstract.base_response import BaseResponse, BaseListResponse
+from PRICE.base.abstract.base_response import BaseResponse, BaseListResponse
 
 
 @dataclass
@@ -48,12 +48,6 @@ class DepositAccountFieldList(BaseListResponse):
 
 
 class DepositAccountRequestModel(BaseResponse):
-    def __init__(self, keys=None, objs=None, **kwargs):
-        self._VARS = [DepositAccountKeys.CUSTOMER_ID, DepositAccountKeys.DEPOSIT_ID,
-                      DepositAccountKeys.DEPOSIT_ACCOUNT_ID]
-        self._OBJS = [DepositAccountKeys.FIELDS]
-
-        self._combine_args(keys=keys, objs=objs)
-        kwargs[DepositAccountKeys.FIELDS] = DepositAccountFieldList(*kwargs.get(DepositAccountKeys.FIELDS))
-
-        super().__init__(keys=self._VARS, objs=self._OBJS, **kwargs)
+    ADD_KEYS = [DepositAccountKeys.CUSTOMER_ID, DepositAccountKeys.DEPOSIT_ID,
+                DepositAccountKeys.DEPOSIT_ACCOUNT_ID, DepositAccountKeys.FIELDS]
+    SUB_MODELS = [None, None, None, DepositAccountFieldList]

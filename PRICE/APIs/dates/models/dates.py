@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from base.abstract.base_response import BaseResponse, BaseListResponse
+from PRICE.base.abstract.base_response import BaseResponse, BaseListResponse
 
 
 @dataclass
@@ -11,7 +11,7 @@ class DateKeys:
 
 class DateEntry(BaseResponse):
     ADD_KEYS = [DateKeys.DATE_NAME, DateKeys.DATE_VALUE]
-    SUB_MODELS = None
+    SUB_MODELS = [None, None]
 
 
 @dataclass

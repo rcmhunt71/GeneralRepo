@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from base.abstract.base_response import BaseResponse
+from PRICE.base.abstract.base_response import BaseResponse
 
 
 @dataclass
@@ -20,12 +20,12 @@ class RateQuoteDetailsInfoKeys:
 
 
 class RateQuoteDetails(BaseResponse):
-    def __init__(self, **kwargs):
-        self._VARS = [
+    ADD_KEYS = [
             RateQuoteDetailsInfoKeys.VENDOR, RateQuoteDetailsInfoKeys.PAYMENT_PERIOD,
             RateQuoteDetailsInfoKeys.RENEWAL_TYPE, RateQuoteDetailsInfoKeys.ZERO_DUE_AT_CLOSING,
             RateQuoteDetailsInfoKeys.REFUNDABLE, RateQuoteDetailsInfoKeys.COVERAGE,
             RateQuoteDetailsInfoKeys.PAYMENT_TYPE, RateQuoteDetailsInfoKeys.MIS_SPECIAL_DEAL,
             RateQuoteDetailsInfoKeys.RATE_QUOTE_ID, RateQuoteDetailsInfoKeys.RATE_PLAN_TYPE,
             RateQuoteDetailsInfoKeys.STATUS_DESCRIPTION]
-        super().__init__(keys=self._VARS, **kwargs)
+    SUB_MODELS = [None for _ in range(len(ADD_KEYS))]
+

@@ -34,6 +34,9 @@ class BaseResponse:
 
             # If ADD_KEYS and SUB_MODELS provided, the number per list MUST be the same.
             elif len(self.SUB_MODELS) != len(self.ADD_KEYS):
+                log.debug(f"Key Mismatch: SUB_MODELS: {len(self.SUB_MODELS)}   ADD_KEYS: {len(self.ADD_KEYS)}")
+                log.debug(f"SUB_MODELS: {self.SUB_MODELS}")
+                log.debug(f"ADD_KEYS: {self.ADD_KEYS}")
                 raise ModelKeyMismatch()
 
             # Number of ADD_KEYS and SUB_MODELS match, so if:

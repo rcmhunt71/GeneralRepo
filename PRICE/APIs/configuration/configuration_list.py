@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from base.common.response import CommonResponse
+from PRICE.base.common.response import CommonResponse
 
 
 @dataclass
@@ -9,7 +9,5 @@ class ConfigurationListKeys:
 
 
 class ConfigurationList(CommonResponse):
-
-    def __init__(self, **kwargs):
-        self._VARS = [ConfigurationListKeys.CONFIGURATION_LIST]
-        super().__init__(keys=self._VARS, **kwargs)
+    ADD_KEYS = [ConfigurationListKeys.CONFIGURATION_LIST]
+    SUB_MODELS = [None]

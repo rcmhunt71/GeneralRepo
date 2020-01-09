@@ -67,16 +67,5 @@ class LoanFeeKeys:
 
 
 class LoanFees(BaseResponse):
-    def __init__(self, keys=None, objs=None, **kwargs):
-
-        key_models = [(LoanFeeColumnKeys.COLS, LoanFeeColumnEntryList),
-                      (LoanFeeRowKeys.ROWS, LoanFeeRowColList)]
-
-        objs = objs or []
-
-        for (key, model) in key_models:
-            if key in kwargs:
-                objs.append(key)
-                kwargs[key] = model(*kwargs.get(key))
-
-        super().__init__(keys=keys, objs=objs, **kwargs)
+    ADD_KEYS = [LoanFeeColumnKeys.COLS, LoanFeeRowKeys.ROWS]
+    SUB_MODELS = [LoanFeeColumnEntryList, LoanFeeRowColList]

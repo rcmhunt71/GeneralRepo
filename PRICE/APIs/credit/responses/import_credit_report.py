@@ -1,8 +1,7 @@
-from APIs.credit.models.import_credit_report import ImportCreditReportKeys
-from base.common.response import CommonResponse
+from PRICE.APIs.credit.models.import_credit_report import ImportCreditReportKeys
+from PRICE.base.common.response import CommonResponse
 
 
 class ImportCreditReport(CommonResponse):
-    def __init__(self, **kwargs):
-        self._VARS = [ImportCreditReportKeys.WAS_THERE_ANYTHING_IMPORTED]
-        super().__init__(keys=self._VARS, **kwargs)
+    ADD_KEYS = [ImportCreditReportKeys.WAS_THERE_ANYTHING_IMPORTED]
+    SUB_MODELS = [None]

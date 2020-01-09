@@ -1,4 +1,4 @@
-from base.common import CommonResponse
+from PRICE.base.common.response import CommonResponse
 
 
 class SetLoanQuoteRateDetails(CommonResponse):

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from base.abstract.base_response import BaseResponse, BaseListResponse
+from PRICE.base.abstract.base_response import BaseResponse, BaseListResponse
 
 
 # --------------------------------
@@ -39,9 +39,8 @@ class AddLoanRowColKeys:
 
 
 class AddLoanValueEntry(BaseResponse):
-    def __init__(self, **kwargs):
-        self._VARS = [AddLoanRowValueKeys.VALUE]
-        super().__init__(keys=self._VARS, **kwargs)
+    ADD_KEYS = [AddLoanRowValueKeys.VALUE]
+    SUB_MODELS = [None]
 
 
 class AddLoanRowColsValue(BaseListResponse):

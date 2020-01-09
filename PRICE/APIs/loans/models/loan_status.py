@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from base.abstract.base_response import BaseResponse, BaseListResponse
+from PRICE.base.abstract.base_response import BaseResponse, BaseListResponse
 
 
 @dataclass
@@ -11,9 +11,8 @@ class LoanStatusKeys:
 
 
 class LoanStatus(BaseResponse):
-    def __init__(self, **kwargs):
-        self._VARS = [LoanStatusKeys.F_LOAN_NUMBER_ID, LoanStatusKeys.F_LOAN_STATUS]
-        super().__init__(keys=self._VARS, **kwargs)
+    ADD_KEYS = [LoanStatusKeys.F_LOAN_NUMBER_ID, LoanStatusKeys.F_LOAN_STATUS]
+    SUB_MODELS = [None, None]
 
 
 class LoanStatuses(BaseListResponse):

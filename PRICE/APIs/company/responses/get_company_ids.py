@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from base.common.response import CommonResponse
+from PRICE.base.common.response import CommonResponse
 
 
 @dataclass
@@ -9,6 +9,5 @@ class GetCompanyIDsKeys:
 
 
 class GetCompanyIDsResponse(CommonResponse):
-    def __init__(self, **kwargs):
-        self._VARS = [GetCompanyIDsKeys.COMPANY_IDS]
-        super().__init__(keys=self._VARS, **kwargs)
+    ADD_KEYS = [GetCompanyIDsKeys.COMPANY_IDS]
+    SUB_MODELS = [None]

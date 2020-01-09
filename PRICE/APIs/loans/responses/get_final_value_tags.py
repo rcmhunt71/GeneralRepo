@@ -1,13 +1,10 @@
-from APIs.loans.models.final_value import FinalValueFieldsKeys, FinalValueScreenKeys
-from base.common.response import CommonResponse
+from PRICE.APIs.loans.models.final_value import FinalValueFieldsKeys, FinalValueScreenKeys
+from PRICE.base.common.response import CommonResponse
 
 
 class GetFinalValueTags(CommonResponse):
-
-    def __init__(self, **kwargs):
-        self._VARS = [FinalValueScreenKeys.FINAL_VALUE_SCREEN, FinalValueFieldsKeys.FINAL_VALUE_FIELD]
-
-        super().__init__(keys=self._VARS, **kwargs)
+    ADD_KEYS = [FinalValueScreenKeys.FINAL_VALUE_SCREEN, FinalValueFieldsKeys.FINAL_VALUE_FIELD]
+    SUB_MODELS = [None, None]
 
     def get_final_value_screens(self):
         return getattr(self, FinalValueScreenKeys.FINAL_VALUE_SCREEN)

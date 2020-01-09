@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from base.abstract.base_response import BaseResponse, BaseListResponse
+from PRICE.base.abstract.base_response import BaseResponse, BaseListResponse
 
 
 @dataclass
@@ -23,12 +23,11 @@ class LicenseDataKeys:
 
 
 class License(BaseResponse):
-    def __init__(self, **kwargs):
-        self._VARS = [LicenseInfoKeys.LICENSE_ID, LicenseInfoKeys.LICENSE_NAME, LicenseInfoKeys.LICENSE_NUMBER,
-                      LicenseInfoKeys.LICENSE_FROM, LicenseInfoKeys.LICENSE_EXPIRES, LicenseInfoKeys.STATE,
-                      LicenseInfoKeys.STATE_DEFAULT, LicenseInfoKeys.LIEN_POSITION, LicenseInfoKeys.LICENSE_TYPE,
-                      LicenseInfoKeys.DBAID]
-        super().__init__(keys=self._VARS, **kwargs)
+    ADD_KEYS = [LicenseInfoKeys.LICENSE_ID, LicenseInfoKeys.LICENSE_NAME, LicenseInfoKeys.LICENSE_NUMBER,
+                LicenseInfoKeys.LICENSE_FROM, LicenseInfoKeys.LICENSE_EXPIRES, LicenseInfoKeys.STATE,
+                LicenseInfoKeys.STATE_DEFAULT, LicenseInfoKeys.LIEN_POSITION, LicenseInfoKeys.LICENSE_TYPE,
+                LicenseInfoKeys.DBAID]
+    SUB_MODELS = [None for _ in range(len(ADD_KEYS))]
 
 
 class Licenses(BaseListResponse):

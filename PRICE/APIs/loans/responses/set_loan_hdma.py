@@ -1,4 +1,4 @@
-from base.common.response import CommonResponse
+from PRICE.base.common.response import CommonResponse
 
 
 class SetLoanHDMA(CommonResponse):

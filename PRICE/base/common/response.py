@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
-from base.abstract.base_response import BaseResponse
-from base.common.models.stats import StatsModel
-from base.common.models.version import VersionModel
+from PRICE.base.abstract.base_response import BaseResponse
+from PRICE.base.common.models.stats import StatsModel
+from PRICE.base.common.models.version import VersionModel
 
 
 @dataclass

@@ -1,5 +1,5 @@
-from APIs.loans.models.license_data import Licenses, LicenseDataKeys
-from base.common.response import CommonResponse
+from PRICE.APIs.loans.models.license_data import Licenses, LicenseDataKeys
+from PRICE.base.common.response import CommonResponse
 
 
 class GetLoanLicenseData(CommonResponse):

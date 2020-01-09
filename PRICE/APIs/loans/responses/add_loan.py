@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from base.common.response import CommonResponse
+from PRICE.base.common.response import CommonResponse
 
 
 @dataclass
