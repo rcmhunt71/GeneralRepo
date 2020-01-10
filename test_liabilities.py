@@ -2,8 +2,9 @@ from random import choice, randrange
 import unittest
 
 from PRICE.APIs.liability.models.liability import (LiabilitiesKeys, LiabilityEntryKeys, LiabilityEntry,
-                                                   LiabilityEntriesList)
+                                                   LiabilityEntriesList, AddLiabilityKeys)
 from PRICE.APIs.liability.responses.get_liabilities import GetLiabilities
+from PRICE.APIs.liability.responses.add_liability import AddLiability
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
 liability_types = ["other", "revolving", "HELOC", "auto"]
@@ -11,6 +12,7 @@ applicant_names = ["Jane Doe", "John Doe", "Freddy Kruger", "Jason (NLN)", "Mich
 yes_no = ["Yes", "No"]
 
 NUMBER_OF_LIABILITIES = 15
+
 
 def build_liability_entry():
     return {
@@ -56,6 +58,14 @@ class TestLiabilities(unittest.TestCase, CommonResponseValidations):
 
         self._verify(descript=f"{response.model_name} has {key} attribute",
                      actual=hasattr(response, key), expected=True)
+        self._validate_response(model=response, model_data=data)
+
+
+class TestAddLiability(unittest.TestCase, CommonResponseValidations):
+    def test_AddLiability_response(self):
+        data = response_args.copy()
+        data[AddLiabilityKeys.LIABILITY_ID] = randrange(999999)
+        response = AddLiability(**data)
         self._validate_response(model=response, model_data=data)
 
 

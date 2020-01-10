@@ -23,6 +23,11 @@ class LiabilitiesKeys:
     LIABILITIES: str = "Liabilities"
 
 
+@dataclass
+class AddLiabilityKeys:
+    LIABILITY_ID: str = "LiabilityID"
+
+
 class LiabilityEntry(BaseResponse):
     ADD_KEYS = [LiabilityEntryKeys.LIABILITY_ID, LiabilityEntryKeys.CUSTOMER_ID, LiabilityEntryKeys.INSTITUTION_ID,
                 LiabilityEntryKeys.LIABILITY_TYPE, LiabilityEntryKeys.ACCOUNT_NAME, LiabilityEntryKeys.ACCOUNT_NUMBER,
