@@ -47,8 +47,14 @@ class BaseResponse:
                 if key in kwargs and kwargs.get(key) is not None:
                     if model is not None:
                         data = kwargs.get(key)
-                        log.debug(f"Building '{model}' with {data}")
-                        kwargs[key] = model(*data) if isinstance(data, list) else model(**data)
+
+                        if isinstance(data, list):
+                            log.debug(f"Inserting '{model}' into '{key}' attribute with list {data}")
+                            kwargs[key] = model(*data)
+                        else:
+                            log.debug(f"Inserting '{model}' into '{key}' attribute with dict {data}")
+                            kwargs[key] = model(**data)
+
                         self._OBJS.append(key)
                         updated_kwargs = True
                     else:
