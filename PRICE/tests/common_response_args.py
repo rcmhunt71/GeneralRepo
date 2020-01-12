@@ -66,3 +66,14 @@ class CommonResponseValidations:
             self.assertListEqual(actual, expected)
         else:
             self.assertEqual(actual, expected)
+
+    @staticmethod
+    def _show_response(response_model):
+        if "DEBUG" in os.environ:
+            border = "-" * 80
+            print(f"\n{border}\nRESPONSE RECEIVED:\n{border}")
+            print(f"URL: {response_model.response.method.upper()} {response_model.response.url}"
+                  f"?{response_model.response.params}")
+            print(f"HEADERS: {response_model.response.headers}")
+            print(f"RESPONSE: {type(response_model)}\n{response_model}")
+            print(f"{border}\n")

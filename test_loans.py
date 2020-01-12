@@ -1,27 +1,35 @@
+import os
 import unittest
 
-from APIs.loans.models.add_loan_data import (
+from PRICE.APIs.loans.models.add_loan_data import (
     AddLoanDataColEntryKeys, AddLoanRowValueKeys, AddLoanDataTableKeys, AddLoanDataColEntry, AddLoanDataCols,
     AddLoanValueEntry, AddLoanRowColsValue, AddLoanRowColKeys, AddLoanRowEntry, AddLoanRowList, AddLoanDataTable)
-from APIs.loans.models.final_value import FinalValueFieldsKeys, FinalValueScreenKeys
-from APIs.loans.models.loan_detail_data import LoanDetailDataTableKeys
-from APIs.loans.responses.add_loan import AddLoanKeys, AddLoan
-from APIs.loans.responses.get_final_value_tags import GetFinalValueTags
-from APIs.loans.responses.get_loan import GetLoan
-from APIs.loans.responses.get_loan_detail import GetLoanDetail
-from PRICE.logger.logging import Logger
-from PRICE.tests.common_response_args import CommonResponseValidations, response_args
+from PRICE.APIs.loans.models.final_value import FinalValueFieldsKeys, FinalValueScreenKeys
+from PRICE.APIs.loans.models.loan_detail_data import LoanDetailDataTableKeys
+from PRICE.APIs.loans.responses.add_loan import AddLoanKeys, AddLoan
+from PRICE.APIs.loans.responses.get_final_value_tags import GetFinalValueTags
+from PRICE.APIs.loans.responses.get_loan import GetLoan
+from PRICE.APIs.loans.responses.get_loan_detail import GetLoanDetail
 
-log = Logger()
+from PRICE.base.clients.loans import LoanClient
+
+from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
 # ---------------------------------------------------------------
 #     TEST DATA
 # ---------------------------------------------------------------
 
 # ================================================================
+#     Client Info
+# ================================================================
+BASE_URL = "auto.test.pclender.dom"
+DATABASE = "testset1"
+PORT = 8080
+
+# ================================================================
 #     AddLoan Data
 # ================================================================
-loan_id = "8675309"
+LOAN_ID = "8675309"
 
 # ================================================================
 #     FinalValue Data
@@ -119,7 +127,7 @@ loan_detail_data_table = {AddLoanDataTableKeys.COLS: add_loan_data_columns_list,
 class TestAddLoans(unittest.TestCase, CommonResponseValidations):
     def test_add_loans_response(self):
         add_loan_args = response_args.copy()
-        add_loan_args[AddLoanKeys.NEW_LOAN_NUMBER_ID] = loan_id
+        add_loan_args[AddLoanKeys.NEW_LOAN_NUMBER_ID] = LOAN_ID
         add_loan_response = AddLoan(**add_loan_args)
 
         # Verify response contains correct common data + added tags
@@ -257,6 +265,22 @@ class TestGetLoan(unittest.TestCase, CommonResponseValidations):
                 actual=hasattr(sub_model, attr), expected=True)
 
         self._validate_response(model=get_loan_resp, model_data=get_loan_detail_data)
+
+
+class TestLoanClient(unittest.TestCase, CommonResponseValidations):
+    def test_AddLoan_client(self):
+        # Build mock data to insert into client response
+        add_loan_args = response_args.copy()
+        add_loan_args[AddLoanKeys.NEW_LOAN_NUMBER_ID] = LOAN_ID
+
+        # Use client to make call
+        client = LoanClient(base_url=BASE_URL, database=DATABASE, port=PORT)
+        client.insert_test_response_data(data=add_loan_args)
+
+        # Make and validate client call
+        response_model = client.add_loan(session_id="123456789", nonce="DEADBEEF15DECEA5ED")
+        self._show_response(response_model=response_model)
+        self._validate_response(model=response_model, model_data=add_loan_args)
 
 
 if __name__ == '__main__':

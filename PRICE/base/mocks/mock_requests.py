@@ -1,3 +1,8 @@
+from PRICE.logger.logging import Logger
+
+log = Logger()
+
+
 # Mock of requests until able install Requests
 class MockRequests:
 
@@ -23,9 +28,16 @@ class Response:
         self.raw = "RAW CONTENT"
         self.content = "CONTENT"
         self.headers = headers or {}
-        self.params = params or {}
         self.payload = data or {}
+        self.params = self._params(params or {})
         self.url = url
         self.method = method
         self.encoding = "ISO-8859-1"
         self.text = [attr for attr in dir(self) if not attr.startswith('__')]
+
+    def _params(self, params=None):
+        params = params or self.params
+
+        param_str = "&". join(["=".join([key, value]) for key, value in params.items()])
+        log.debug(f"PARAMS: {params} ---> PARAM STR: {param_str}")
+        return param_str
