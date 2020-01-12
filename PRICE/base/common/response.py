@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from PRICE.base.abstract.base_response import BaseResponse
+from PRICE.base.responses.base_response import BaseResponse
 from PRICE.base.common.models.stats import StatsModel
 from PRICE.base.common.models.version import VersionModel
 

@@ -10,7 +10,7 @@ from PRICE.APIs.loans.responses.get_final_value_tags import GetFinalValueTags
 from PRICE.APIs.loans.responses.get_loan import GetLoan
 from PRICE.APIs.loans.responses.get_loan_detail import GetLoanDetail
 
-from PRICE.base.clients.loans import LoanClient
+from PRICE.APIs.loans.client import LoanClient
 
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
