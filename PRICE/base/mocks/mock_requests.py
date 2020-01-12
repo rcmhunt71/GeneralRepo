@@ -38,6 +38,6 @@ class Response:
     def _params(self, params=None):
         params = params or self.params
 
-        param_str = "&". join(["=".join([key, value]) for key, value in params.items()])
+        param_str = "&". join(["=".join([key, str(value)]) for key, value in params.items()])
         log.debug(f"PARAMS: {params} ---> PARAM STR: {param_str}")
         return param_str

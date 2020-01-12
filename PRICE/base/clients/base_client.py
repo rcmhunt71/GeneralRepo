@@ -35,7 +35,9 @@ class BaseClient:
         return self._make_call(resource_endpoint, response_model,
                                method=Methods.DELETE, headers=headers, params=params)
 
-    def post(self, resource_endpoint, response_model, data, headers=None, params=None):
+    def post(self, resource_endpoint, response_model, data, headers=None, params=None, binary_data=None):
+        if binary_data is not None:
+            data = binary_data
         return self._make_call(resource_endpoint, response_model, data=data,
                                method=Methods.POST, headers=headers, params=params)
 
