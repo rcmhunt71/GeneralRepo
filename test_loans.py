@@ -1,4 +1,3 @@
-import os
 import unittest
 
 from PRICE.APIs.loans.models.add_loan_data import (
