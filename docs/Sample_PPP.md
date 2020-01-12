@@ -9,7 +9,7 @@
 > * What is "completed"?
 > * What is "in progress"?
 
-## Completed
+## *Completed*
 **SATURN**
 * **DEV**
   * Resolved [MDBACKLOG-9876](https://www.fiserv.com) (Showstopper). Impact: *\<Briefly explain issue and impact to customer/revenue>* 
@@ -33,7 +33,7 @@
 
 -------------------------------------------------------------------
 
-## In Progress
+## *In Progress*
 > List work in progress and the expected date of completion.
 
 **SATURN**
@@ -52,7 +52,7 @@
 
 -------------------------------------------------------------------
 
-# Plans
+# PLANS
 > List work to be started/continued, and if known, the expected date of completion.
 
 **SATURN**
@@ -77,7 +77,7 @@
 * **QE Resources**
   * **FYI**: *Two resources* will be joining the week of 01/19/20. Plan to onboard the week they start and focus on automation for *\<insert initial product focus here>*. 
 
-# Problems
+# PROBLEMS
 
 > Provide a brief description of the issue, the impact it has on the team or business, and steps being taken for mitigation/resolution.
 
