@@ -40,6 +40,7 @@ class LoanDetailRowValueEntry(BaseResponse):
     ADD_KEYS = [LoanDetailRowValueKeys.VALUE]
     SUB_MODELS = [None]
 
+
 class LoanDetailRowColsValue(BaseListResponse):
     SUB_MODEL = LoanDetailRowValueEntry
 

@@ -5,3 +5,10 @@ TODO List:
 * Add document on Object Model hierarchy and architecture
     - set DEBUG=1 to enable debug logging
     - set DEBUG= to reset logging to default level (INFO)
+
+
+
+NOTES:
+- API inconsistency with add_a_loan|import_from_file and import_from_file_with_date:
+    add_a_loan has NewLoanNumberID
+    import_from_file_with_date has inconsistency in examples (one example uses NewLoanNumberID and other uses NewLoanName)

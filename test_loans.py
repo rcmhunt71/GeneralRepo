@@ -1,3 +1,4 @@
+from random import randrange
 import unittest
 
 from PRICE.APIs.loans.models.add_loan_data import (
@@ -5,12 +6,12 @@ from PRICE.APIs.loans.models.add_loan_data import (
     AddLoanValueEntry, AddLoanRowColsValue, AddLoanRowColKeys, AddLoanRowEntry, AddLoanRowList, AddLoanDataTable)
 from PRICE.APIs.loans.models.final_value import FinalValueFieldsKeys, FinalValueScreenKeys
 from PRICE.APIs.loans.models.loan_detail_data import LoanDetailDataTableKeys
-from PRICE.APIs.loans.responses.add_loan import AddLoanKeys, AddLoan
+from PRICE.APIs.loans.responses.add_loan import AddALoanKeys, AddALoanResponse
 from PRICE.APIs.loans.responses.get_final_value_tags import GetFinalValueTags
 from PRICE.APIs.loans.responses.get_loan import GetLoan
 from PRICE.APIs.loans.responses.get_loan_detail import GetLoanDetail
 
-from PRICE.APIs.loans.client import LoanClient
+from PRICE.APIs.loans.client import LoanClient, ImportFromFileFileTypes
 
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
@@ -126,8 +127,8 @@ loan_detail_data_table = {AddLoanDataTableKeys.COLS: add_loan_data_columns_list,
 class TestAddLoans(unittest.TestCase, CommonResponseValidations):
     def test_add_loans_response(self):
         add_loan_args = response_args.copy()
-        add_loan_args[AddLoanKeys.NEW_LOAN_NUMBER_ID] = LOAN_ID
-        add_loan_response = AddLoan(**add_loan_args)
+        add_loan_args[AddALoanKeys.NEW_LOAN_NUMBER_ID] = LOAN_ID
+        add_loan_response = AddALoanResponse(**add_loan_args)
 
         # Verify response contains correct common data + added tags
         self._validate_response(model=add_loan_response, model_data=add_loan_args)
@@ -270,16 +271,49 @@ class TestLoanClient(unittest.TestCase, CommonResponseValidations):
     def test_AddLoan_client(self):
         # Build mock data to insert into client response
         add_loan_args = response_args.copy()
-        add_loan_args[AddLoanKeys.NEW_LOAN_NUMBER_ID] = LOAN_ID
+        add_loan_args[AddALoanKeys.NEW_LOAN_NUMBER_ID] = LOAN_ID
 
         # Use client to make call
         client = LoanClient(base_url=BASE_URL, database=DATABASE, port=PORT)
         client.insert_test_response_data(data=add_loan_args)
 
         # Make and validate client call
-        response_model = client.add_loan(session_id="123456789", nonce="DEADBEEF15DECEA5ED")
+        response_model = client.add_loan(session_id="123456789", nonce="DEADBEEF15DECEA5ED", )
         self._show_response(response_model=response_model)
         self._validate_response(model=response_model, model_data=add_loan_args)
+
+    def test_ImportFromFile_client(self):
+        import_loan_resp = response_args.copy()
+        import_loan_resp[AddALoanKeys.NEW_LOAN_NUMBER_ID] = f"{randrange(99999999):08}"
+
+        # Use client to make call
+        client = LoanClient(base_url=BASE_URL, database=DATABASE, port=PORT)
+        client.insert_test_response_data(data=import_loan_resp)
+
+        # Make and validate client call
+        response_model = client.import_from_file(
+            session_id="123456789", nonce="DEADBEEF15DECEA5ED", loan_number=f"{randrange(999999):06}",
+            file_type=ImportFromFileFileTypes.FANNIE_MAE, date_name="Prequalified", base64_file_data="<binary_file>")
+        self._show_response(response_model=response_model)
+        self._validate_response(model=response_model, model_data=import_loan_resp)
+
+    def test_ImportFromFileWithDate_client(self):
+        upload_token = "T89SWT821NTW84H682JCS03"  # Typically gotten from data.update_data API call
+
+        import_loan_resp = response_args.copy()
+        import_loan_resp[AddALoanKeys.NEW_LOAN_NUMBER_ID] = f"{randrange(99999999):08}"
+
+        # Use client to make call
+        client = LoanClient(base_url=BASE_URL, database=DATABASE, port=PORT)
+        client.insert_test_response_data(data=import_loan_resp)
+
+        # Make and validate client call
+        response_model = client.import_from_file_with_date(
+            session_id="123456789", nonce="DEADBEEF15DECEA5ED", loan_number=f"{randrange(999999):06}",
+            upload_token=upload_token, file_type=ImportFromFileFileTypes.FANNIE_MAE, date_name="Prequalified",
+            b2b_flag=True)
+        self._show_response(response_model=response_model)
+        self._validate_response(model=response_model, model_data=import_loan_resp)
 
 
 if __name__ == '__main__':
