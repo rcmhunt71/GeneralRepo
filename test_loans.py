@@ -7,7 +7,7 @@ from PRICE.APIs.loans.models.add_loan_data import (
 from PRICE.APIs.loans.models.final_value import FinalValueFieldsKeys, FinalValueScreenKeys
 from PRICE.APIs.loans.models.loan_detail_data import LoanDetailDataTableKeys
 from PRICE.APIs.loans.responses.add_loan import AddALoanKeys, AddALoanResponse
-from PRICE.APIs.loans.responses.get_final_value_tags import GetFinalValueTags
+from PRICE.APIs.loans.responses.get_final_value_tags import GetFinalValueTagsResponse
 from PRICE.APIs.loans.responses.get_loan import GetLoanResponse
 from PRICE.APIs.loans.responses.get_loan_detail import GetLoanDetailResponse
 
@@ -136,7 +136,7 @@ class TestAddLoans(unittest.TestCase, CommonResponseValidations):
 
 class TestGetFinalValueTags(unittest.TestCase, CommonResponseValidations):
     def test_get_final_value_response(self):
-        fb_tags_resp = GetFinalValueTags(**get_fv_tags_args)
+        fb_tags_resp = GetFinalValueTagsResponse(**get_fv_tags_args)
 
         # Verify FinalValue tags are in model
         for attr, attr_data_list in fv_data:
@@ -153,14 +153,14 @@ class TestGetFinalValueTags(unittest.TestCase, CommonResponseValidations):
 
     def test_get_final_value_fields_response_method(self):
         key = FinalValueFieldsKeys.FINAL_VALUE_FIELD
-        fb_tags_resp = GetFinalValueTags(**get_fv_tags_args)
+        fb_tags_resp = GetFinalValueTagsResponse(**get_fv_tags_args)
         self._verify(
             descript=f"{fb_tags_resp.model_name}: '{key}' lists are identical",
             actual=getattr(fb_tags_resp, key), expected=fb_tags_resp.get_final_value_fields())
 
     def test_get_final_value_screen_response_method(self):
         key = FinalValueScreenKeys.FINAL_VALUE_SCREEN
-        fb_tags_resp = GetFinalValueTags(**get_fv_tags_args)
+        fb_tags_resp = GetFinalValueTagsResponse(**get_fv_tags_args)
         self._verify(
             descript=f"{fb_tags_resp.model_name}: '{key}' lists are identical",
             actual=getattr(fb_tags_resp, key), expected=fb_tags_resp.get_final_value_screens())
@@ -226,6 +226,7 @@ class TestAddLoanData(unittest.TestCase, CommonResponseValidations):
                 actual=hasattr(data_table_resp, attr), expected=True)
 
         self._validate_response(model=data_table_resp, model_data=add_loan_data_table)
+
 
 # ---------------------------------------------------------------
 #     GET LOAN TESTS
@@ -340,7 +341,18 @@ class TestLoanClient(unittest.TestCase, CommonResponseValidations):
         response_model = client.get_loan_details(session_id="1232465798", nonce="DEADBEEF15DECEA5ED",
                                                  loan_number_id=f"{randrange(999999):06}")
         self._show_response(response_model=response_model)
-        self._validate_response(model=response_model, model_data=add_loan_data_table)
+        self._validate_response(model=response_model, model_data=get_loan_detail_data)
+
+    def test_GetFinalValueTags_client(self):
+        final_value_tags_data = get_fv_tags_args
+
+        client = LoanClient(base_url=BASE_URL, database=DATABASE, port=PORT)
+        client.insert_test_response_data(data=final_value_tags_data)
+
+        response_model = client.get_final_value_tags(session_id="1232465798", nonce="DEADBEEF15DECEA5ED",
+                                                     loan_number_id=f"{randrange(999999):06}")
+        self._show_response(response_model=response_model)
+        self._validate_response(model=response_model, model_data=final_value_tags_data)
 
 
 if __name__ == '__main__':

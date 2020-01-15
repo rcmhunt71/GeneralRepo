@@ -23,3 +23,7 @@ class GetLoanRequest(BaseRequestModel):
 
 class GetLoanDetailRequest(GetLoanRequest):
     pass
+
+
+class GetFinalValueTagsRequest(GetLoanRequest):
+    pass

@@ -2,7 +2,7 @@ from PRICE.APIs.loans.models.final_value import FinalValueFieldsKeys, FinalValue
 from PRICE.base.common.response import CommonResponse
 
 
-class GetFinalValueTags(CommonResponse):
+class GetFinalValueTagsResponse(CommonResponse):
     ADD_KEYS = [FinalValueScreenKeys.FINAL_VALUE_SCREEN, FinalValueFieldsKeys.FINAL_VALUE_FIELD]
     SUB_MODELS = [None, None]
 
