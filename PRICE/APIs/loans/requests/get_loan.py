@@ -19,3 +19,7 @@ class GetLoanRequest(BaseRequestModel):
             GetLoanRequestParams.NONCE: self.nonce,
             GetLoanRequestParams.LOAN_NUMBER_ID: self.loan_number_id,
         }
+
+
+class GetLoanDetailRequest(GetLoanRequest):
+    pass

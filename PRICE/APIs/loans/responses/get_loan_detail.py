@@ -4,7 +4,7 @@ from PRICE.APIs.loans.models.loan_detail_data import (
 from PRICE.base.common.response import CommonResponse
 
 
-class GetLoanDetail(CommonResponse):
+class GetLoanDetailResponse(CommonResponse):
     ADD_KEYS = [LoanDetailDataTableKeys.DATA_TABLE]
     SUB_MODELS = [LoanDetailDataTable]
 

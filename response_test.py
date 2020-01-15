@@ -3,7 +3,7 @@
 from APIs.configuration.configuration_list import ConfigurationList, ConfigurationListKeys
 from APIs.loans.models.loan_detail_data import (
     LoanDetailColEntryKeys, LoanDetailRowValueKeys, LoanDetailDataTableKeys, LoanDetailRowColKeys)
-from APIs.loans.responses.get_loan_detail import GetLoanDetail
+from APIs.loans.responses.get_loan_detail import GetLoanDetailResponse
 from PRICE.tests.common_response_args import response_args
 from base.common.response import CommonResponseKeys
 
@@ -74,7 +74,7 @@ print(f"CONFIGURATION LIST:\n{configuration}")
 
 loan_detail_data = response_args.copy()
 loan_detail_data[LoanDetailDataTableKeys.DATA_TABLE] = loan_detail_data_table
-loan_detail_resp = GetLoanDetail(**loan_detail_data)
+loan_detail_resp = GetLoanDetailResponse(**loan_detail_data)
 loan_detail_resp.show_data_table()
 print(f"RAW STATS DATA: {getattr(loan_detail_resp, CommonResponseKeys.STATS).raw}")
 print(f"VERSION: {loan_detail_resp.Version.full_version_info()}\n")

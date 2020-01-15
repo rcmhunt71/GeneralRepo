@@ -9,7 +9,7 @@ from PRICE.APIs.loans.models.loan_detail_data import LoanDetailDataTableKeys
 from PRICE.APIs.loans.responses.add_loan import AddALoanKeys, AddALoanResponse
 from PRICE.APIs.loans.responses.get_final_value_tags import GetFinalValueTags
 from PRICE.APIs.loans.responses.get_loan import GetLoanResponse
-from PRICE.APIs.loans.responses.get_loan_detail import GetLoanDetail
+from PRICE.APIs.loans.responses.get_loan_detail import GetLoanDetailResponse
 
 from PRICE.APIs.loans.client import LoanClient, ImportFromFileFileTypes
 
@@ -227,7 +227,9 @@ class TestAddLoanData(unittest.TestCase, CommonResponseValidations):
 
         self._validate_response(model=data_table_resp, model_data=add_loan_data_table)
 
-
+# ---------------------------------------------------------------
+#     GET LOAN TESTS
+# ---------------------------------------------------------------
 class TestGetLoan(unittest.TestCase, CommonResponseValidations):
     def test_GetLoan_response(self):
         get_loan_data = response_args.copy()
@@ -250,7 +252,7 @@ class TestGetLoan(unittest.TestCase, CommonResponseValidations):
     def test_GetLoanDetail_response(self):
         get_loan_detail_data = response_args.copy()
         get_loan_detail_data[AddLoanDataTableKeys.DATA_TABLE] = add_loan_data_table
-        get_loan_resp = GetLoanDetail(**get_loan_detail_data)
+        get_loan_resp = GetLoanDetailResponse(**get_loan_detail_data)
 
         # ERROR: Need to address that basic row element is different than add_loan_data table element.
 
@@ -324,6 +326,19 @@ class TestLoanClient(unittest.TestCase, CommonResponseValidations):
 
         response_model = client.get_loan(session_id="1232465798", nonce="DEADBEEF15DECEA5ED",
                                          loan_number_id=f"{randrange(999999):06}")
+        self._show_response(response_model=response_model)
+        self._validate_response(model=response_model, model_data=add_loan_data_table)
+
+    @unittest.skip("Need to fix data supporting underlying model")
+    def test_GetLoanDetails_client(self):
+        get_loan_detail_data = response_args.copy()
+        get_loan_detail_data[AddLoanDataTableKeys.DATA_TABLE] = add_loan_data_table
+
+        client = LoanClient(base_url=BASE_URL, database=DATABASE, port=PORT)
+        client.insert_test_response_data(data=get_loan_detail_data)
+
+        response_model = client.get_loan_details(session_id="1232465798", nonce="DEADBEEF15DECEA5ED",
+                                                 loan_number_id=f"{randrange(999999):06}")
         self._show_response(response_model=response_model)
         self._validate_response(model=response_model, model_data=add_loan_data_table)
 
