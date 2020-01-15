@@ -3,7 +3,7 @@ from PRICE.APIs.loans.models.add_loan_data import (
 from PRICE.base.common.response import CommonResponse
 
 
-class GetLoan(CommonResponse):
+class GetLoanResponse(CommonResponse):
 
     def __init__(self, **kwargs):
         key = AddLoanDataTableKeys.DATA_TABLE
