@@ -9,12 +9,14 @@ from PRICE.APIs.loans.responses.get_loan_detail import GetLoanDetailResponse
 from PRICE.APIs.loans.responses.get_final_value_tags import GetFinalValueTagsResponse
 from PRICE.APIs.loans.responses.get_loan_license_data import GetLoanLicenseDataResponse
 from PRICE.APIs.loans.responses.get_loan_rate_quote_details import GetLoanRateQuoteDetailsResponse
-
+from PRICE.APIs.loans.responses.get_loan_statuses import GetLoanStatusesResponse
 
 from PRICE.APIs.loans.requests.add_loan import ImportFromFileRequest, ImportFromFileWithDateRequest
 from PRICE.APIs.loans.requests.get_loan import GetLoanRequest, GetLoanDetailRequest, GetFinalValueTagsRequest
 from PRICE.APIs.loans.requests.get_loan_license_data import GetLoanLicenseDataRequest
 from PRICE.APIs.loans.requests.get_loan_rate_quote_details import GetLoanRateQuoteDetailsRequest
+from PRICE.APIs.loans.requests.get_loan_statuses import GetLoanStatusesRequest
+
 
 class ImportFromFileFileTypes(Enum):
     LOSFILE = 0
@@ -94,6 +96,14 @@ class LoanClient(BaseClient):
         request_model = GetLoanRateQuoteDetailsRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetLoanRateQuoteDetailsResponse
         endpoint = "get_loan_rate_quote_details"
+        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
+                            params=request_model.as_params_dict)
+        return response
+
+    def get_loan_statuses(self, session_id, nonce, loan_number_id):
+        request_model = GetLoanStatusesRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
+        response_model = GetLoanStatusesResponse
+        endpoint = "get_loan_statuses"
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
         return response
