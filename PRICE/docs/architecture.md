@@ -80,7 +80,7 @@ The response model class will deserialize the JSON-formatted API response into a
 * **Organization and files**
 * **Execution**
  
-      python -m unittest \<file.py> [\<TestClassName>\<test_method>] [-v[v[v]]]
+      python -m unittest \<file.py> [<TestClassName>.<test_method>] [-v[v[v]]]
       
 * **Issues**
 * **Future Enhancements**
