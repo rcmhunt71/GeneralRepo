@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 
 from base.clients.base_client import BaseClient
@@ -26,12 +27,25 @@ class ImportFromFileFileTypes(Enum):
     MISMO_NYLX = 4
 
 
+@dataclass
+class ApiEndpoints:
+    ADD_A_LOAN: str = "add_a_loan"
+    GET_FINAL_VALUE_TAG: str = "get_final_value_tags"
+    GET_LOAN: str = "get_loan"
+    GET_LOAN_DETAIL: str = "get_loan_detail"
+    GET_LOAN_LICENSE_DATA: str = "get_loan_license_data"
+    GET_LOAN_RATE_QUOTE_DETAILS: str = "get_loan_rate_quote_details"
+    GET_LOAN_STATUSES: str = "get_loan_statuses"
+    IMPORT_FROM_FILE: str = "import_from_file"
+    IMPORT_FROM_FILE_WITH_DATE: str = "import_from_file_with_date"
+
+
 class LoanClient(BaseClient):
 
     def add_loan(self, session_id, nonce):
         request_model = BaseRequestModel(session_id=session_id, nonce=nonce)
         response_model = AddALoanResponse
-        endpoint = "add_a_loan"
+        endpoint = ApiEndpoints.ADD_A_LOAN
 
         response = self.post(resource_endpoint=endpoint, response_model=response_model, data={},
                              params=request_model.as_params_dict)
@@ -42,7 +56,7 @@ class LoanClient(BaseClient):
                                               file_type=file_type, date_name=date_name,
                                               base64_file_data=base64_file_data)
         response_model = ImportFromFileResponse
-        endpoint = "import_from_file"
+        endpoint = ApiEndpoints.IMPORT_FROM_FILE
 
         response = self.post(resource_endpoint=endpoint, response_model=response_model, data={},
                              params=request_model.as_params_dict, binary_data=base64_file_data)
@@ -53,7 +67,7 @@ class LoanClient(BaseClient):
                                                       file_type=file_type, date_name=date_name, b2b_flag=b2b_flag,
                                                       upload_token=upload_token)
         response_model = ImportFromFileWithDateResponse
-        endpoint = "import_from_file_with_date"
+        endpoint = ApiEndpoints.IMPORT_FROM_FILE_WITH_DATE
 
         response = self.post(resource_endpoint=endpoint, response_model=response_model, data={},
                              params=request_model.as_params_dict)
@@ -62,7 +76,7 @@ class LoanClient(BaseClient):
     def get_loan(self, session_id, nonce, loan_number_id):
         request_model = GetLoanRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetLoanResponse
-        endpoint = "get_loan"
+        endpoint = ApiEndpoints.GET_LOAN
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
         return response
@@ -70,7 +84,7 @@ class LoanClient(BaseClient):
     def get_loan_detail(self, session_id, nonce, loan_number_id):
         request_model = GetLoanDetailRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetLoanDetailResponse
-        endpoint = "get_loan_detail"
+        endpoint = ApiEndpoints.GET_LOAN_DETAIL
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
         return response
@@ -78,7 +92,7 @@ class LoanClient(BaseClient):
     def get_final_value_tags(self, session_id, nonce, loan_number_id):
         request_model = GetFinalValueTagsRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetFinalValueTagsResponse
-        endpoint = "get_final_value_tags"
+        endpoint = ApiEndpoints.GET_FINAL_VALUE_TAG
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
         return response
@@ -87,7 +101,7 @@ class LoanClient(BaseClient):
         request_model = GetLoanLicenseDataRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id,
                                                   data_from=data_from, data_id=data_id)
         response_model = GetLoanLicenseDataResponse
-        endpoint = "get_loan_license_data"
+        endpoint = ApiEndpoints.GET_LOAN_LICENSE_DATA
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
         return response
@@ -95,7 +109,7 @@ class LoanClient(BaseClient):
     def get_loan_rate_quote_details(self, session_id, nonce, loan_number_id):
         request_model = GetLoanRateQuoteDetailsRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetLoanRateQuoteDetailsResponse
-        endpoint = "get_loan_rate_quote_details"
+        endpoint = ApiEndpoints.GET_LOAN_RATE_QUOTE_DETAILS
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
         return response
@@ -103,7 +117,7 @@ class LoanClient(BaseClient):
     def get_loan_statuses(self, session_id, nonce, loan_number_id):
         request_model = GetLoanStatusesRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetLoanStatusesResponse
-        endpoint = "get_loan_statuses"
+        endpoint = ApiEndpoints.GET_LOAN_STATUSES
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
         return response
