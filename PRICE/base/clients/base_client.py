@@ -15,14 +15,25 @@ class Methods(Enum):
 
 
 class BaseClient:
-    def __init__(self, base_url, database, port=None, headers=None):
-        self.base_url = f"{base_url}:{port}" if port is not None else base_url
-        self.url = f"{self.base_url}/{database}"
-        self.headers = headers or {}
-        self.test_response_data = None
+    def __init__(self, base_url, database, port=None, headers=None, client=None):
 
-        if not self.url.lower().startswith("http"):
-            self.url = f"https://{self.url}"
+        # If provided an existing client, use that info...
+        if client is not None and isinstance(client, BaseClient):
+            self.client = client
+            self.base_url = client.base_url
+            self.url = client.url
+            self.headers = client.headers
+
+        # Otherwise, instantiate a client.
+        else:
+            self.base_url = f"{base_url}:{port}" if port is not None else base_url
+            self.url = f"{self.base_url}/{database}"
+            self.headers = headers or {}
+
+            if not self.url.lower().startswith("http"):
+                self.url = f"https://{self.url}"
+
+        self.test_response_data = None
 
     def insert_test_response_data(self, data):
         self.test_response_data = data

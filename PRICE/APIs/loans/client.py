@@ -7,9 +7,11 @@ from PRICE.APIs.loans.responses.add_loan import AddALoanResponse, ImportFromFile
 from PRICE.APIs.loans.responses.get_loan import GetLoanResponse
 from PRICE.APIs.loans.responses.get_loan_detail import GetLoanDetailResponse
 from PRICE.APIs.loans.responses.get_final_value_tags import GetFinalValueTagsResponse
+from PRICE.APIs.loans.responses.get_loan_license_data import GetLoanLicenseDataResponse
 
 from PRICE.APIs.loans.requests.add_loan import ImportFromFileRequest, ImportFromFileWithDateRequest
 from PRICE.APIs.loans.requests.get_loan import GetLoanRequest, GetLoanDetailRequest, GetFinalValueTagsRequest
+from PRICE.APIs.loans.requests.get_loan_license_data import GetLoanLicenseDataRequest
 
 
 class ImportFromFileFileTypes(Enum):
@@ -33,7 +35,8 @@ class LoanClient(BaseClient):
 
     def import_from_file(self, session_id, nonce, loan_number, file_type, date_name, base64_file_data):
         request_model = ImportFromFileRequest(session_id=session_id, nonce=nonce, loan_number=loan_number,
-                                              file_type=file_type, date_name=date_name, base64_file_data=base64_file_data)
+                                              file_type=file_type, date_name=date_name,
+                                              base64_file_data=base64_file_data)
         response_model = ImportFromFileResponse
         endpoint = "import_from_file"
 
@@ -58,16 +61,14 @@ class LoanClient(BaseClient):
         endpoint = "get_loan"
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
-
         return response
 
-    def get_loan_details(self, session_id, nonce, loan_number_id):
+    def get_loan_detail(self, session_id, nonce, loan_number_id):
         request_model = GetLoanDetailRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetLoanDetailResponse
         endpoint = "get_loan_detail"
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
-
         return response
 
     def get_final_value_tags(self, session_id, nonce, loan_number_id):
@@ -76,5 +77,13 @@ class LoanClient(BaseClient):
         endpoint = "get_final_value_tags"
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
+        return response
 
+    def get_loan_license_data(self, session_id, nonce, loan_number_id, data_from, data_id):
+        request_model = GetLoanLicenseDataRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id,
+                                                  data_from=data_from, data_id=data_id)
+        response_model = GetLoanLicenseDataResponse
+        endpoint = "get_loan_license_data"
+        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
+                            params=request_model.as_params_dict)
         return response

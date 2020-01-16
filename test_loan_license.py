@@ -1,12 +1,23 @@
 import unittest
 from random import choice, randrange
 
-from APIs.loans.models.license_data import License, LicenseInfoKeys, Licenses, LicenseDataKeys
-from APIs.loans.responses.get_loan_license_data import GetLoanLicenseData
+from PRICE.APIs.loans.client import LoanClient
+from PRICE.APIs.loans.models.license_data import License, LicenseInfoKeys, Licenses, LicenseDataKeys
+from PRICE.APIs.loans.requests.get_loan_license_data import UnknownDataFromTypeException, LoanLicenseDataFrom
+from PRICE.APIs.loans.responses.get_loan_license_data import GetLoanLicenseDataResponse
+
 from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
 
 log = Logger()
+
+
+# ================================================================
+#     Client Info
+# ================================================================
+BASE_URL = "auto.test.pclender.dom"
+DATABASE = "testset1"
+PORT = 8080
 
 
 # --------------------------------------------------
@@ -62,7 +73,7 @@ class TestLoanLicenses(unittest.TestCase, CommonResponseValidations):
 
         licenses_args = response_args.copy()
         licenses_args[LicenseDataKeys.LICENSE_DATA] = licenses_data
-        get_license_info_resp = GetLoanLicenseData(**licenses_args)
+        get_license_info_resp = GetLoanLicenseDataResponse(**licenses_args)
 
         self._verify(
             descript=f"{get_license_info_resp.model_name} - has '{primary_license_data_key}' attribute",
@@ -85,6 +96,35 @@ class TestLoanLicenses(unittest.TestCase, CommonResponseValidations):
                     actual=getattr(model, attr), expected=licenses_data[index][attr])
 
         self._validate_response(model=get_license_info_resp, model_data=licenses_args)
+
+
+class TestLoanLicenseClient(unittest.TestCase, CommonResponseValidations):
+    def test_GetLoanLicenseData_client(self):
+        licenses_args = response_args.copy()
+        licenses_args[LicenseDataKeys.LICENSE_DATA] = licenses_data
+
+        client = LoanClient(base_url=BASE_URL, database=DATABASE, port=PORT)
+        client.insert_test_response_data(data=licenses_args)
+
+        response_model = client.get_loan_license_data(
+            session_id="1232465798", nonce="DEADBEEF15DECEA5ED",
+            loan_number_id=f"{randrange(999999):06}", data_from=LoanLicenseDataFrom.LOAN_OFFICER.value,
+            data_id=randrange(99999999))
+
+        self._show_response(response_model=response_model)
+        self._validate_response(model=response_model, model_data=licenses_args)
+
+    def test_GetLoanLicenseData_client_unknown_data_for_datafrom_type(self):
+        licenses_args = response_args.copy()
+        licenses_args[LicenseDataKeys.LICENSE_DATA] = licenses_data
+
+        client = LoanClient(base_url=BASE_URL, database=DATABASE, port=PORT)
+        client.insert_test_response_data(data=licenses_args)
+
+        with self.assertRaises(UnknownDataFromTypeException):
+            client.get_loan_license_data(
+                session_id="1232465798", nonce="DEADBEEF15DECEA5ED",
+                loan_number_id=f"{randrange(999999):06}", data_from=1001, data_id=randrange(99999999))
 
 
 if __name__ == '__main__':

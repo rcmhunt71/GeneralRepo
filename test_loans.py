@@ -338,8 +338,8 @@ class TestLoanClient(unittest.TestCase, CommonResponseValidations):
         client = LoanClient(base_url=BASE_URL, database=DATABASE, port=PORT)
         client.insert_test_response_data(data=get_loan_detail_data)
 
-        response_model = client.get_loan_details(session_id="1232465798", nonce="DEADBEEF15DECEA5ED",
-                                                 loan_number_id=f"{randrange(999999):06}")
+        response_model = client.get_loan_detail(session_id="1232465798", nonce="DEADBEEF15DECEA5ED",
+                                                loan_number_id=f"{randrange(999999):06}")
         self._show_response(response_model=response_model)
         self._validate_response(model=response_model, model_data=get_loan_detail_data)
 
