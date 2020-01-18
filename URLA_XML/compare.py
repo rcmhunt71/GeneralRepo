@@ -128,18 +128,23 @@ class BaseDealElement:
 
     def __init__(self, data: typing.OrderedDict, index: int = None, path: str = None) -> typing.NoReturn:
         self.data = data
+
+        if not isinstance(data, OrderedDict):
+            print(f"DATA:\n{data}")
+            print(f"INDEX: {index}")
+            print(f"TYPE: {type(data)}")
+
         self.index = index
         self.type = self.TYPE
-        self.seq_num = data.get(UrlaXmlKeys.SEQ_NUM, "NOT_STE")
+        self.seq_num = data.get(UrlaXmlKeys.SEQ_NUM, "NOT_SET")
         self.name = data.get(UrlaXmlKeys.XLINK_LABEL, "NOT SET")
         self.path = path or f"//{self.DELIMITER.join(self._build_xpath())}({UrlaXmlKeys.XLINK_LABEL}={self.name})"
         self.id_set = self.build_id_set()
 
     def _build_xpath(self) -> typing.List:
         xpath = [self.PATH]
-        if self.index is not None:
-            xpath[-1] += f"[{self.index}]"
-        xpath.append(self.type)
+        elem_type = self.type if self.index is None else f"{self.type}[{self.index}]"
+        xpath.append(elem_type)
         return xpath
 
     def build_id_set(self) -> typing.Set:
@@ -195,6 +200,10 @@ class BaseDealElement:
         # return the accumulated list of tag[:tag[:tag]]:value strings
         return set_data
 
+    @staticmethod
+    def check_value_list(data_value):
+        return data_value if isinstance(data_value, list) else [data_value]
+
 
 class Asset(BaseDealElement):
     PATH = "/".join(ElementPath().ASSETS_PATH)
@@ -239,29 +248,43 @@ if __name__ == '__main__':
 
     source = URLA_XML(source_file=XML_SOURCE)
 
+    if WRITE_TO_OUTFILE:
+        dict_info = pprint.pformat(json.dumps(source.data), indent=4, width=180, compact=False)
+        print(f"Contents:\n{dict_info}")
+        source.dump_data_to_file(outfile=OUT_FILE, data_dict=dict_info)
+
     assets_dict = source.get_assets_list()
     liabilities_dict = source.get_liabilities_list()
     expenses_dict = source.get_expenses_list()
+    loan_dict = source.get_loans_list()
+    party_dict = source.get_parties_list()
+    collat_dict = source.get_collaterals_list()
 
     print()
     deal_lists = [
-        [Asset(data=asset_data, index=idx) for idx, asset_data in enumerate(assets_dict.get(UrlaXmlKeys.ASSET))],
-        [Liability(data=liab_data, index=idx) for idx, liab_data in enumerate(liabilities_dict.get(UrlaXmlKeys.LIABILITY))],
-        [Expense(data=exp_data, index=idx) for idx, exp_data in enumerate(expenses_dict.get(UrlaXmlKeys.EXPENSE))],  ## <-- ERROR
+        [Asset(data=asset_data, index=idx) for idx, asset_data in
+         enumerate(Asset.check_value_list(assets_dict.get(UrlaXmlKeys.ASSET)))],
+        [Liability(data=liab_data, index=idx) for idx, liab_data in
+         enumerate(Liability.check_value_list(liabilities_dict.get(UrlaXmlKeys.LIABILITY)))],
+        # [Expense(data=exp_data, index=idx) for idx, exp_data in
+        #  enumerate(Expense.check_value_list(expenses_dict.get(UrlaXmlKeys.EXPENSE)))],  ## <-- ERROR
+        [Loan(data=loan_data, index=idx) for idx, loan_data in
+         enumerate(Loan.check_value_list(loan_dict.get(UrlaXmlKeys.LOAN)))],
+        [Party(data=party_data, index=idx) for idx, party_data in
+         enumerate(Party.check_value_list(party_dict.get(UrlaXmlKeys.PARTY)))],
+        [Collateral(data=collat_data, index=idx) for idx, collat_data in
+         enumerate(Collateral.check_value_list(collat_dict.get(UrlaXmlKeys.COLLATERAL)))],
     ]
 
-    target_index = 2
+    target_index = 1
 
     for obj_list in deal_lists:
         for index, obj in enumerate(obj_list):
-            if index == target_index - 1:
-                print(f"({index}): {obj.name}\n"
+            if index == target_index - 1 and index < len(obj_list):
+                print(f"({index}): {obj.type} [NAME = {obj.name}]\n"
                       f"\tPATH: {obj.path}\n"
                       f"\tID_SET: {obj.id_set}\n"
                       f"\tDATA: {pprint.pformat(obj.data)}\n")
         print()
 
-    if WRITE_TO_OUTFILE:
-        dict_info = pprint.pformat(json.dumps(source.data), indent=4, width=180, compact=False)
-        print(f"Contents:\n{dict_info}")
-        source.dump_data_to_file(outfile=OUT_FILE, data_dict=dict_info)
+
