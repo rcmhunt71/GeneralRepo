@@ -66,7 +66,7 @@ class UrlaXmlKeys:
 @dataclass
 class ElementPath:
     """
-    Predefined paths to specific MISMO v3.4. elements, using the UrlaMxlKeys CONSTANTS.
+    Predefined paths to specific MISMO v3.4. elements, using the UrlaXmlKeys CONSTANTS.
     """
     ASSETS_PATH: typing.List[str] = field(
         default_factory=lambda: [UrlaXmlKeys.MESSAGE, UrlaXmlKeys.DEAL_SETS, UrlaXmlKeys.DEAL_SET, UrlaXmlKeys.DEALS,
@@ -98,7 +98,7 @@ class UrlaXML:
     to process the XML, and allows the user to quickly access the various data elements within the XML.
 
     """
-    def __init__(self, source_file_name: str):
+    def __init__(self, source_file_name: str) -> typing.NoReturn:
         self.source_file_name = source_file_name
         self.data = self.convert_xml_to_dict(source_file_name)
 
@@ -229,7 +229,7 @@ class UrlaXML:
             data_dict[dict_key] = dict_value if isinstance(data_dict[dict_key], list) else [dict_value]
         return data_dict
 
-    def _get_element_family(self, family) -> OrderedDict:
+    def _get_element_family(self, family: str) -> OrderedDict:
         """
         Get the OrderedDict stored at the specified level.
         :return: List of OrderedDicts containing the specified data.
