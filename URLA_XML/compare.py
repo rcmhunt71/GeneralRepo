@@ -162,7 +162,7 @@ class UrlaXML:
 
         return data_subset
 
-    def get_assets_list(self) -> OrderedDict:
+    def get_assets(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the ASSETS level.
         :return: List of OrderedDicts containing the ASSET data.
@@ -170,7 +170,7 @@ class UrlaXML:
         family = UrlaXmlKeys.ASSETS
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_liabilities_list(self) -> OrderedDict:
+    def get_liabilities(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the LIABILITIES level.
         :return: List of OrderedDicts containing the LIABILITY data.
@@ -178,7 +178,7 @@ class UrlaXML:
         family = UrlaXmlKeys.LIABILITIES
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_loans_list(self) -> OrderedDict:
+    def get_loans(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the LOANS level.
         :return: List of OrderedDicts containing the LOAN data.
@@ -186,7 +186,7 @@ class UrlaXML:
         family = UrlaXmlKeys.LOANS
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_collaterals_list(self) -> OrderedDict:
+    def get_collaterals(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the COLLATERALS level.
         :return: List of OrderedDicts containing the COLLATERAL data.
@@ -194,7 +194,7 @@ class UrlaXML:
         family = UrlaXmlKeys.COLLATERALS
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_expenses_list(self) -> OrderedDict:
+    def get_expenses(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the EXPENSES level.
         :return: List of OrderedDicts containing the EXPENSE data.
@@ -202,7 +202,7 @@ class UrlaXML:
         family = UrlaXmlKeys.EXPENSES
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_relationships_list(self) -> OrderedDict:
+    def get_relationships(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the RELATIONSHIPS level.
         :return: List of OrderedDicts containing the RELATIONSHIP data.
@@ -210,7 +210,7 @@ class UrlaXML:
         family = UrlaXmlKeys.RELATIONSHIPS
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_parties_list(self) -> OrderedDict:
+    def get_parties(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the PARTIES level.
         :return: List of OrderedDicts containing the PARTY data.
@@ -467,12 +467,12 @@ if __name__ == '__main__':
     write_debug_files(source_obj=source, compare_obj=compare, cli_args=cli.args)
 
     # Get lists of OrderedDicts for various elements in the source MISMO XML
-    assets_dict = source.get_assets_list()
-    liabilities_dict = source.get_liabilities_list()
-    expenses_dict = source.get_expenses_list()
-    loan_dict = source.get_loans_list()
-    party_dict = source.get_parties_list()
-    collat_dict = source.get_collaterals_list()
+    assets_dict = source.get_assets()
+    liabilities_dict = source.get_liabilities()
+    expenses_dict = source.get_expenses()
+    loan_dict = source.get_loans()
+    party_dict = source.get_parties()
+    collat_dict = source.get_collaterals()
 
     # For dev and debug, create lists of sub-DEAL-<TAG> OrderedDicts
     print()
