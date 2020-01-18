@@ -1,11 +1,30 @@
-from collections import OrderedDict
-from dataclasses import dataclass, field
+import argparse
 import json
 import os
 import pprint
 import typing
+from collections import OrderedDict
+from dataclasses import dataclass, field
 
 import xmltodict
+
+
+class CLIArgs:
+    def __init__(self):
+        self.parser = argparse.ArgumentParser()
+        self._defined_args()
+        self.args = self.parser.parse_args()
+
+    def _defined_args(self):
+        self.parser.add_argument(
+            "-s", "--source", required=True,
+            help="Source XML file to use for comparison to other MISMO formatted XML files")
+        self.parser.add_argument(
+            "-c", "--compare", required=True,
+            help="MISMO formatted XML file to verify against source XML file")
+        self.parser.add_argument(
+            "-o", "--outfile", action="store_true",
+            help="[OPTIONAL] Create outfile of XML to dict conversion processes (for debugging)")
 
 
 @dataclass
@@ -63,7 +82,7 @@ class ElementPath:
 class URLA_XML:
     def __init__(self, source_file):
         self.source_file = source_file
-        self.data = self.convert_xml_to_dict(XML_SOURCE)
+        self.data = self.convert_xml_to_dict(source_file)
 
     @staticmethod
     def read_file(filename: str) -> typing.List[str]:
@@ -72,7 +91,7 @@ class URLA_XML:
             return FILE.readlines()
 
     @classmethod
-    def convert_xml_to_dict(cls, filename: str) -> typing.OrderedDict:
+    def convert_xml_to_dict(cls, filename: str):  # -> typing.OrderedDict: (not supported in Python 3.7)
         if not os.path.exists(filename):
             raise FileNotFoundError(f"XML Source file ('{filename}') was not found.")
 
@@ -80,12 +99,12 @@ class URLA_XML:
         return xmltodict.parse("\n".join(file_contents))
 
     @staticmethod
-    def dump_data_to_file(outfile: str, data_dict: typing.OrderedDict) -> typing.NoReturn:
+    def dump_data_to_file(outfile: str, data_dict) -> typing.NoReturn:
         with open(outfile, "w") as OUT:
             OUT.writelines(data_dict)
-        print(f"Wrote to OUTFILE: {outfile} Created? {os.path.exists(outfile)}")
+        print(f"Wrote to OUTFILE: {outfile} --> Created Successfully? {os.path.exists(outfile)}")
 
-    def _get_nested_subdict(self, keys_list: typing.List[str]) -> typing.OrderedDict:
+    def _get_nested_subdict(self, keys_list: typing.List[str]):  # -> typing.OrderedDict: Not supported in Python 3.7
         data_subset = self.data
         for key in keys_list:
             if key in data_subset:
@@ -126,7 +145,7 @@ class BaseDealElement:
     DELIMITER = "/"
     TYPE = "UNKNOWN"
 
-    def __init__(self, data: typing.OrderedDict, index: int = None, path: str = None) -> typing.NoReturn:
+    def __init__(self, data, index: int = None, path: str = None) -> typing.NoReturn:
         self.data = data
 
         if not isinstance(data, OrderedDict):
@@ -150,7 +169,7 @@ class BaseDealElement:
     def build_id_set(self) -> typing.Set:
         return set(self._build_id_list())
 
-    def _build_id_list(self, key: str = None, data_set: typing.OrderedDict = None, tag=None) -> typing.List:
+    def _build_id_list(self, key: str = None, data_set=None, tag: str = None) -> typing.List:
         """
         Recursively traverses the OrderDict, building a list of path strings. The path strings are the colon-delimited
         paths and final value.
@@ -235,23 +254,35 @@ class Party(BaseDealElement):
     TYPE = UrlaXmlKeys.PARTY
 
 
+def _build_out_filename(directory, filename, extension):
+    filename = filename.split(os.path.sep)[-1]
+    filename = f"{'.'.join(filename.split('.')[:-1])}.{extension}"
+    return os.path.sep.join(['.', directory, filename])
+
+
+def write_debug_files(source_obj, compare_obj, cli_args):
+    if cli_args.outfile:
+        OUT_DIR = 'outfiles'
+        FILE_EXT = 'debug'
+        INDENT, WIDTH = (4, 180)
+
+        out_primary_filespec = _build_out_filename(directory=OUT_DIR, filename=cli_args.source, extension=FILE_EXT)
+        out_compare_filespec = _build_out_filename(directory=OUT_DIR, filename=cli_args.compare, extension=FILE_EXT)
+
+        primary_dict_info = pprint.pformat(json.dumps(source_obj.data), indent=INDENT, width=WIDTH, compact=False)
+        compare_dict_info = pprint.pformat(json.dumps(compare_obj.data), indent=INDENT, width=WIDTH, compact=False)
+
+        source_obj.dump_data_to_file(outfile=out_primary_filespec, data_dict=primary_dict_info)
+        compare_obj.dump_data_to_file(outfile=out_compare_filespec, data_dict=compare_dict_info)
+
+
 if __name__ == '__main__':
-    WRITE_TO_OUTFILE = False
+    cli = CLIArgs()
 
-    # Build input & output file specs
-    XML_FILENAME = 'D1_CO2.xml'
-    OUT_FILENAME = "D1_CO2.dict"
-    SOURCE_DIR = "xml_files"
-    OUT_DIR = 'outfiles'
-    XML_SOURCE = os.path.sep.join(['.', SOURCE_DIR, XML_FILENAME])
-    OUT_FILE = os.path.sep.join(['.', OUT_DIR, OUT_FILENAME])
+    source = URLA_XML(source_file=cli.args.source)
+    compare = URLA_XML(source_file=cli.args.compare)
 
-    source = URLA_XML(source_file=XML_SOURCE)
-
-    if WRITE_TO_OUTFILE:
-        dict_info = pprint.pformat(json.dumps(source.data), indent=4, width=180, compact=False)
-        print(f"Contents:\n{dict_info}")
-        source.dump_data_to_file(outfile=OUT_FILE, data_dict=dict_info)
+    write_debug_files(source_obj=source, compare_obj=compare, cli_args=cli.args)
 
     assets_dict = source.get_assets_list()
     liabilities_dict = source.get_liabilities_list()
