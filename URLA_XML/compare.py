@@ -98,9 +98,9 @@ class UrlaXML:
     to process the XML, and allows the user to quickly access the various data elements within the XML.
 
     """
-    def __init__(self, source_file: str):
-        self.source_file = source_file
-        self.data = self.convert_xml_to_dict(source_file)
+    def __init__(self, source_file_name: str):
+        self.source_file_name = source_file_name
+        self.data = self.convert_xml_to_dict(source_file_name)
 
     @staticmethod
     def read_file(filename: str) -> typing.List[str]:
@@ -420,35 +420,33 @@ def _build_out_filename(target_dir: str, input_fname: str, ext: str) -> str:
     return os.path.abspath(os.path.sep.join(['.', target_dir, input_fname]))
 
 
-def write_debug_files(source_obj: UrlaXML, compare_obj: UrlaXML, cli_args: argparse.Namespace) -> typing.NoReturn:
+def write_debug_files(source_obj: UrlaXML, compare_obj: UrlaXML) -> typing.NoReturn:
     """
-    Given the UrlaXML objs, write the OrderedDict as a str (OrderedDict is output from converting XML to dict)
+    Given the UrlaXML objs, write each objects's OrderedDict as a str (OrderedDict = output from converting XML to dict)
 
     :param source_obj: Source XML object
     :param compare_obj: Comparison XML object
-    :param cli_args: CLI args (should the files be written, based on CLI args provided)
 
     :return: None
 
     """
-    # If --outfile/-o boolean is True, create the files
-    if cli_args.outfile:
-        outfile_dir, outfile_ext = ('outfiles', 'out')
-        indent, width = (4, 180)
+    # Outfile definition parameters
+    outfile_dir, outfile_ext = ('outfiles', 'out')
+    indent, width = (4, 180)
 
-        # Build file spec (filename + path)
-        out_primary_file_spec = _build_out_filename(
-            target_dir=outfile_dir, input_fname=cli_args.source, ext=outfile_ext)
-        out_compare_file_spec = _build_out_filename(
-            target_dir=outfile_dir, input_fname=cli_args.compare, ext=outfile_ext)
+    # Build file spec (filename + path)
+    out_primary_file_spec = _build_out_filename(
+        target_dir=outfile_dir, input_fname=source_obj.source_file_name, ext=outfile_ext)
+    out_compare_file_spec = _build_out_filename(
+        target_dir=outfile_dir, input_fname=compare_obj.source_file_name, ext=outfile_ext)
 
-        # Build output data structure (as string)
-        primary_dict_info = pprint.pformat(json.dumps(source_obj.data), indent=indent, width=width, compact=False)
-        compare_dict_info = pprint.pformat(json.dumps(compare_obj.data), indent=indent, width=width, compact=False)
+    # Build output data structure (as string)
+    primary_dict_info = pprint.pformat(json.dumps(source_obj.data), indent=indent, width=width, compact=False)
+    compare_dict_info = pprint.pformat(json.dumps(compare_obj.data), indent=indent, width=width, compact=False)
 
-        # Write to file
-        source_obj.dump_data_to_file(outfile=out_primary_file_spec, data_dict=primary_dict_info)
-        compare_obj.dump_data_to_file(outfile=out_compare_file_spec, data_dict=compare_dict_info)
+    # Write to file
+    source_obj.dump_data_to_file(outfile=out_primary_file_spec, data_dict=primary_dict_info)
+    compare_obj.dump_data_to_file(outfile=out_compare_file_spec, data_dict=compare_dict_info)
 
 
 # ------------------------------------------------
@@ -460,13 +458,14 @@ if __name__ == '__main__':
     cli = CLIArgs()
 
     # Create URLA XML Objects (read file, convert to nested OrderedDict structure)
-    source = UrlaXML(source_file=cli.args.source)
-    compare = UrlaXML(source_file=cli.args.compare)
+    source = UrlaXML(source_file_name=cli.args.source)
+    compare = UrlaXML(source_file_name=cli.args.compare)
 
     # Write debug files if requested
-    write_debug_files(source_obj=source, compare_obj=compare, cli_args=cli.args)
+    if cli.args.outfile:
+        write_debug_files(source_obj=source, compare_obj=compare)
 
-    # Get lists of OrderedDicts for various elements in the source MISMO XML
+    # Get lists of OrderedDicts for various elements in the source MISMO v.3.4 XML
     assets_dict = source.get_assets()
     liabilities_dict = source.get_liabilities()
     expenses_dict = source.get_expenses()
