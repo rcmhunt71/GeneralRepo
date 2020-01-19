@@ -61,6 +61,78 @@ class BaseDealElement:
                               f"({UrlaXmlKeys.XLINK_LABEL}={self.name})")
         self.id_set = self.build_id_set()
 
+    def __eq__(self, other):
+        """
+        Equality is where the symmetric difference (set_x ^ set_y) of the sets is 0.
+        Symmetric different = new set with elements in either self or other, but not both.
+
+        :param other: Instantiated/populated BaseDealElement Obj
+        :return: Boolean
+        """
+        return self.id_set == other.id_set
+
+    def __lt__(self, other):
+        """
+        Less Than: not equal AND is a subset, but other has more elements
+        :param other: Instantiated/populated BaseDealElement Obj
+        :return: Boolean
+        """
+
+        is_eq, is_subset, is_superset = self._get_comparison(other=other)
+        return not is_eq and is_subset
+
+    def __le__(self, other):
+        """
+        Less Than or Equal To:
+           * Equals: equal sets
+               OR
+           * Less Than: not equal AND is a subset but other has more elements
+
+        :param other: Instantiated/populated BaseDealElement Obj
+        :return: Boolean
+        """
+        return self == other or self < other
+
+    def __gt__(self, other):
+        """
+        Greater Than: not equal AND is a subset, but self has more elements
+        :param other: Instantiated/populated BaseDealElement Obj
+        :return: Boolean
+        """
+        is_eq, is_subset, is_superset = self._get_comparison(other=other)
+        return not is_eq and is_superset
+
+    def __ge__(self, other):
+        """
+        Greater Than or Equal To:
+           * Equals: equal sets
+               OR
+           * Greater Than: not equal AND is a subset AND self has more elements
+
+        :param other: Instantiated/populated BaseDealElement Obj
+        :return: Boolean
+        """
+        return self == other or self > other
+
+    def __ne__(self, other):
+        """
+        Are the sets completely unequal (no common elements, disjoint)
+        :param other: Instantiated/populated BaseDealElement Obj
+        :return: Boolean
+        """
+        return self.id_set.isdisjoint(other.id_set)
+
+    def _get_comparison(self, other):
+        """
+        Determine various metrics about the sets. This will determine equality, size different, and are they subsets.
+        :param other: Instantiated/populated BaseDealElement Obj
+        :return: (tuple): is_equal, is_subset, difference_in_length
+        """
+        is_equal = self == other
+        is_subset = self.id_set.issubset(other.id_set)
+        is_superset = self.id_set.issuperset(other.id_set)
+        return is_equal, is_subset, is_superset
+
     def _build_xpath(self) -> typing.List:
         """
         Determines current segment of element XPATH (including position index if in a list context).
