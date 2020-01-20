@@ -136,8 +136,3 @@ if __name__ == "__main__":
         print(f"Is obj1 < obj 2: {set1 < set2}")
         print(f"Is obj1 <= obj 2: {set1 <= set2}")
         print(f"Is obj1 != obj 2: {set1 != set2}\n")
-
-
-# TEST: set1 = data_1, set2 == data_1
-# TEST: set1 = data_1, set2 == data_2
-# TEST: set1 = data_1, set2 == data_3

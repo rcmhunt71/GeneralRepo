@@ -3,6 +3,7 @@ import typing
 from collections import OrderedDict
 
 import xmltodict
+from models.singular_xml_models import Asset, Liability, Expense, Loan, Party, Collateral
 from models.urla_xml_keys import UrlaXmlKeys, ElementPath
 
 
@@ -13,18 +14,18 @@ class UrlaXML:
     to process the XML, and allows the user to quickly access the various data elements within the XML.
 
     """
-    def __init__(self, source_file_name: str) -> typing.NoReturn:
+    def __init__(self, source_file_name: str, primary_source: bool = False) -> typing.NoReturn:
         self.source_file_name = source_file_name
+        self.primary_source = primary_source
         self.data = self.convert_xml_to_dict(source_file_name)
 
-    @staticmethod
-    def read_file(filename: str) -> typing.List[str]:
-        print(f"Reading file: {filename}")
+    def read_file(self, filename: str) -> typing.List[str]:
+        file_type = "primary" if self.primary_source else "comparison"
+        print(f"Reading {file_type} file: '{os.path.abspath(filename)}'")
         with open(filename, "r") as FILE:
             return FILE.readlines()
 
-    @classmethod
-    def convert_xml_to_dict(cls, filespec: str):  # -> typing.OrderedDict: (not supported in Python 3.7)
+    def convert_xml_to_dict(self, filespec: str):  # -> typing.OrderedDict: (not supported in Python 3.7)
         """
         Reads XML and converts the contents to a nested collections.OrderedDict
         :param filespec: filespec of the input XML file.
@@ -35,7 +36,7 @@ class UrlaXML:
         if not os.path.exists(filespec):
             raise FileNotFoundError(f"XML Source file ('{filespec}') was not found.")
 
-        file_contents = cls.read_file(filespec)
+        file_contents = self.read_file(filespec)
         return xmltodict.parse("\n".join(file_contents))
 
     @staticmethod
@@ -70,14 +71,14 @@ class UrlaXML:
             # Gf so, save value and prepare to check next key in the list, record error and stop.
             if key in data_subset:
                 data_subset = data_subset.get(key)
-                print(f"\tFound key: {key} --> Key Sequence: {keys_list} --> Next set of keys: {data_subset.keys()}")
+                # print(f"\tFound key: {key} --> Key Sequence: {keys_list} --> Next set of keys: {data_subset.keys()}")
             else:
-                print(f"\tKey not found: {key} --> Requested Key Sequence: {keys_list}")
+                print(f"\tNOTE: Key not found: {key} --> Requested Key Sequence: {keys_list}")
                 break
 
         return data_subset
 
-    def get_assets(self) -> OrderedDict:
+    def get_assets_dict(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the ASSETS level.
         :return: List of OrderedDicts containing the ASSET data.
@@ -85,7 +86,17 @@ class UrlaXML:
         family = UrlaXmlKeys.ASSETS
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_liabilities(self) -> OrderedDict:
+    def get_assets_elements(self) -> typing.List[Asset]:
+        """
+        Get the list of elements stored in the OrderedDict at the ASSETS level.
+        :return: List of OrderedDicts containing the ASSET data.
+        """
+        family = UrlaXmlKeys.ASSETS
+        child = UrlaXmlKeys.ASSET
+        model = Asset
+        return self._get_elements(family=family, child=child, model=model)
+
+    def get_liabilities_dict(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the LIABILITIES level.
         :return: List of OrderedDicts containing the LIABILITY data.
@@ -93,7 +104,17 @@ class UrlaXML:
         family = UrlaXmlKeys.LIABILITIES
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_loans(self) -> OrderedDict:
+    def get_liabilities_elements(self) -> typing.List[Liability]:
+        """
+        Get the list of elements stored in the OrderedDict at the LIABILITIES level.
+        :return: List of OrderedDicts containing the LIABILITY data.
+        """
+        family = UrlaXmlKeys.LIABILITIES
+        child = UrlaXmlKeys.LIABILITY
+        model = Liability
+        return self._get_elements(family=family, child=child, model=model)
+
+    def get_loans_dict(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the LOANS level.
         :return: List of OrderedDicts containing the LOAN data.
@@ -101,7 +122,17 @@ class UrlaXML:
         family = UrlaXmlKeys.LOANS
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_collaterals(self) -> OrderedDict:
+    def get_loans_elements(self) -> typing.List[Loan]:
+        """
+        Get the list of elements stored in the OrderedDict at the LOANS level.
+        :return: List of OrderedDicts containing the LOAN data.
+        """
+        family = UrlaXmlKeys.LOANS
+        child = UrlaXmlKeys.LOAN
+        model = Loan
+        return self._get_elements(family=family, child=child, model=model)
+
+    def get_collaterals_dict(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the COLLATERALS level.
         :return: List of OrderedDicts containing the COLLATERAL data.
@@ -109,7 +140,17 @@ class UrlaXML:
         family = UrlaXmlKeys.COLLATERALS
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_expenses(self) -> OrderedDict:
+    def get_collaterals_elements(self) -> typing.List[Collateral]:
+        """
+        Get the list of elements stored in the OrderedDict at the COLLATERALS level.
+        :return: List of OrderedDicts containing the COLLATERAL data.
+        """
+        family = UrlaXmlKeys.COLLATERALS
+        child = UrlaXmlKeys.COLLATERAL
+        model = Collateral
+        return self._get_elements(family=family, child=child, model=model)
+
+    def get_expenses_dict(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the EXPENSES level.
         :return: List of OrderedDicts containing the EXPENSE data.
@@ -117,7 +158,17 @@ class UrlaXML:
         family = UrlaXmlKeys.EXPENSES
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_relationships(self) -> OrderedDict:
+    def get_expenses_elements(self) -> typing.List[Expense]:
+        """
+        Get the list of elements stored in the OrderedDict at the EXPENSES level.
+        :return: List of OrderedDicts containing the EXPENSE data.
+        """
+        family = UrlaXmlKeys.EXPENSES
+        child = UrlaXmlKeys.EXPENSE
+        model = Expense
+        return self._get_elements(family=family, child=child, model=model)
+
+    def get_relationships_dict(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the RELATIONSHIPS level.
         :return: List of OrderedDicts containing the RELATIONSHIP data.
@@ -125,13 +176,27 @@ class UrlaXML:
         family = UrlaXmlKeys.RELATIONSHIPS
         return self._check_value_is_list(self._get_element_family(family=family))
 
-    def get_parties(self) -> OrderedDict:
+    def get_parties_dict(self) -> OrderedDict:
         """
         Get the OrderedDict stored at the PARTIES level.
         :return: List of OrderedDicts containing the PARTY data.
         """
         family = UrlaXmlKeys.PARTIES
         return self._check_value_is_list(self._get_element_family(family=family))
+
+    def get_parties_elements(self) -> typing.List[Party]:
+        """
+        Get the list of elements stored in the OrderedDict at the PARTIES level.
+        :return: List of OrderedDicts containing the PARTY data.
+        """
+        family = UrlaXmlKeys.PARTIES
+        child = UrlaXmlKeys.PARTY
+        model = Party
+        return self._get_elements(family=family, child=child, model=model)
+
+    def _get_elements(self, family, child, model):
+        values = self._check_value_is_list(self._get_element_family(family=family)).get(child)
+        return [model(data=asset_data, index=idx) for idx, asset_data in enumerate(values)]
 
     @staticmethod
     def _check_value_is_list(data_dict: OrderedDict) -> OrderedDict:
@@ -148,5 +213,7 @@ class UrlaXML:
         """
         Get the OrderedDict stored at the specified level.
         :return: List of OrderedDicts containing the specified data.
+
+        NOTE: 'family' is used to determine which value from ElementPath to get: e.g. - ElementsPath.ASSETS_PATH
         """
         return self._get_nested_subdict(keys_list=getattr(ElementPath(), f"{family.upper()}_PATH"))
