@@ -30,13 +30,20 @@ class ComparisonEngine:
 
     def compare_and_map_singular_elements(self, element_name: str, details: bool = False) -> typing.List[DataMatch]:
         """
-        Compare su
-        :param element_name: name of URDA element to compare (should be plural, so all singular elements are compared
+        Compare the source and comparison elements for a given DealElement type. If a match is found, map the
+        indices.
+
+        e.g.
+           - Src DealElement index 0 maps to Cmp DealElement index 7,
+           - and the inverse, Cmp DealElement index 7 maps to Src DealElement index 0
+
+        :param element_name: name of DealElement type to compare (should be plural, so all singular elems are compared).
         :param details: (boolean) - If True, generate a summary report
 
-        :return: List of DataMatch objects with corresponding matches (or unmatched)
+        :return: List of Src DataMatch objects with corresponding match data (or noted as unmatched)
+
         """
-        # Verify requested Deal Type is plural (ends in 's') and is a recognized model.
+        # Verify requested DealElement is plural (ends in 's') and is a recognized model.
         if (not hasattr(self.primary, f"get_{element_name.lower()}_elements") or
                 not element_name.lower().endswith('s')):
             print(f"**ERROR**: Unrecognized Plural Deal Type: {element_name.lower()}.")
@@ -46,35 +53,38 @@ class ComparisonEngine:
         source_data_elem = getattr(self.primary, f"get_{element_name.lower()}_elements")()
         comp_data_elem = getattr(self.comparison, f"get_{element_name.lower()}_elements")()
 
-        # Build list of tuples to track mappings
+        # Build list of tuples to track mappings between src and cmp
         source_data = [DataMatch(id_set=elem.id_set, found=False, source_obj=elem, match_obj=None) for elem
                        in source_data_elem]
         comp_data = [DataMatch(id_set=elem.id_set, found=False, source_obj=elem, match_obj=None) for elem
                      in comp_data_elem]
 
-        # Iterate through src doc looking for matches in the comparison doc
+        # Iterate through src data looking for matches in the comparison data
         for src_elem in source_data:
             for comp_elem in comp_data:
 
-                # If comparison element has a match, don't do the comparison
+                # If comparison element already has been matched, skip comparing this element to the source
                 if comp_elem.found:
                     continue
 
-                # If the SRC is identical or is a superset of the comparison, associate the elements.
+                # If the SRC is identical OR is a superset of the comparison, map the elements.
                 if src_elem.id_set >= comp_elem.id_set:
 
+                    # Map the CMP object to the SRC object
                     src_elem.found = True
                     src_elem.match_obj = comp_elem.source_obj
 
+                    # Map the SRC object to the CMP object
                     comp_elem.found = True
                     comp_elem.match_obj = src_elem.source_obj
 
+                    # For manual debugging purposes only... hence always FALSE
                     if details and False:
                         print(f"MATCH FOUND for {element_name}:\n   SRC:\n"
                               f"   {src_elem.id_set} ({src_elem.source_obj.seq_num})")
                         print(f"   COMP:\n   {src_elem.match_obj.id_set} ({src_elem.match_obj.seq_num})\n")
 
-        # if details were requested, build and print a results table.
+        # If details were requested, build and print a results table.
         if details:
             self.build_results_table(results=source_data)
 
