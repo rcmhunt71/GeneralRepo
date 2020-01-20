@@ -5,7 +5,17 @@ from models.urla_xml_model import UrlaXML
 
 
 class DataMatch:
-    def __init__(self, id_set, source_obj: BaseDealElement, found=False, match_obj: BaseDealElement = None):
+    """ Simple data tracking class for mapping source entry to matching comparison entry """
+    def __init__(self, id_set, source_obj: BaseDealElement, found=False,
+                 match_obj: BaseDealElement = None) -> typing.NoReturn:
+        """
+
+        :param id_set: XPATH set and value (':' delimited)
+        :param source_obj: Source Inherited BaseDealElement
+        :param found: (bool) True = match found
+        :param match_obj: If match is True, the corresponding Comparison BaseDealElement
+
+        """
         self.id_set = id_set
         self.source_obj = source_obj
         self.found = found
@@ -21,9 +31,10 @@ class ComparisonEngine:
         """
         Compare su
         :param element_name: name of URDA element to compare (should be plural, so all singular elements are compared
-        :return: TBD
-        """
+        :param details: (boolean) - If True, generate a summary report
 
+        :return: List of DataMatch objects with corresponding matches (or unmatched)
+        """
         # Verify requested Deal Type is plural (ends in 's') and is a recognized model.
         if (not hasattr(self.primary, f"get_{element_name.lower()}_elements") or
                 not element_name.lower().endswith('s')):
@@ -40,6 +51,7 @@ class ComparisonEngine:
         comp_data = [DataMatch(id_set=elem.id_set, found=False, source_obj=elem, match_obj=None) for elem
                      in comp_data_elem]
 
+        # Iterate through src doc looking for matches in the comparison doc
         matches = 0
         for src_elem in source_data:
             for comp_elem in comp_data:
@@ -51,6 +63,7 @@ class ComparisonEngine:
                 # If the SRC is identical or is a superset of the comparison, associate the elements.
                 if src_elem.id_set >= comp_elem.id_set:
                     matches += 1
+
                     src_elem.found = True
                     src_elem.match_obj = comp_elem.source_obj
 

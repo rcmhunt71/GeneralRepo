@@ -25,18 +25,18 @@ class UrlaXML:
         with open(filename, "r") as FILE:
             return FILE.readlines()
 
-    def convert_xml_to_dict(self, filespec: str):  # -> typing.OrderedDict: (not supported in Python 3.7)
+    def convert_xml_to_dict(self, file_spec: str) -> OrderedDict:
         """
         Reads XML and converts the contents to a nested collections.OrderedDict
-        :param filespec: filespec of the input XML file.
+        :param file_spec: filespec of the input XML file.
 
         :return: OrderedDict representation of the XML.
 
         """
-        if not os.path.exists(filespec):
-            raise FileNotFoundError(f"XML Source file ('{filespec}') was not found.")
+        if not os.path.exists(file_spec):
+            raise FileNotFoundError(f"XML Source file ('{file_spec}') was not found.")
 
-        file_contents = self.read_file(filespec)
+        file_contents = self.read_file(file_spec)
         return xmltodict.parse("\n".join(file_contents))
 
     @staticmethod
@@ -194,7 +194,15 @@ class UrlaXML:
         model = Party
         return self._get_elements(family=family, child=child, model=model)
 
-    def _get_elements(self, family, child, model):
+    def _get_elements(self, family: str, child: str, model) -> typing.List:
+        """
+        Get the list of singular elements from the family/parent (plural tag)
+        :param family: Plural tag (e.g. - ASSETS)
+        :param child: Singular tag (e.g. - ASSET)
+        :param model: Model to serialize each child into. (e.g. Asset)
+
+        :return: List of instantiated/populated models of type 'model'
+        """
         values = self._check_value_is_list(self._get_element_family(family=family)).get(child)
         return [model(data=asset_data, index=idx) for idx, asset_data in enumerate(values)]
 
