@@ -8,5 +8,5 @@ setup(name='URLA_XML',
       author='Fiserv',
       author_email='',
       packages=[],
-      requires=['xmltodict'],
+      requires=['xmltodict', 'PrettyTable'],
       )
