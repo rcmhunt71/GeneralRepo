@@ -15,7 +15,7 @@ class Methods(Enum):
 
 
 class BaseClient:
-    def __init__(self, base_url, database, port=None, headers=None, client=None):
+    def __init__(self, base_url, database, port=None, headers=None, client=None, payload=None):
 
         # If provided an existing client, use that info...
         if client is not None and isinstance(client, BaseClient):
@@ -29,6 +29,7 @@ class BaseClient:
             self.base_url = f"{base_url}:{port}" if port is not None else base_url
             self.url = f"{self.base_url}/{database}"
             self.headers = headers or {}
+            self.payload = payload
 
             if not self.url.lower().startswith("http"):
                 self.url = f"https://{self.url}"
@@ -69,6 +70,7 @@ class BaseClient:
 
         if method in [Methods.POST, Methods.PUT]:
             args['data'] = data
+            self.payload = data
 
         full_url_request = f"{method.value.upper()} {url}"
         if params:

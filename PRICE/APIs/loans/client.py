@@ -11,12 +11,14 @@ from PRICE.APIs.loans.responses.get_final_value_tags import GetFinalValueTagsRes
 from PRICE.APIs.loans.responses.get_loan_license_data import GetLoanLicenseDataResponse
 from PRICE.APIs.loans.responses.get_loan_rate_quote_details import GetLoanRateQuoteDetailsResponse
 from PRICE.APIs.loans.responses.get_loan_statuses import GetLoanStatusesResponse
+from PRICE.APIs.loans.responses.set_anti_steering_data import SetAntiSteeringDataResponse
 
 from PRICE.APIs.loans.requests.add_loan import ImportFromFileRequest, ImportFromFileWithDateRequest
 from PRICE.APIs.loans.requests.get_loan import GetLoanRequest, GetLoanDetailRequest, GetFinalValueTagsRequest
 from PRICE.APIs.loans.requests.get_loan_license_data import GetLoanLicenseDataRequest
 from PRICE.APIs.loans.requests.get_loan_rate_quote_details import GetLoanRateQuoteDetailsRequest
 from PRICE.APIs.loans.requests.get_loan_statuses import GetLoanStatusesRequest
+from PRICE.APIs.loans.requests.set_anti_steering_data import SetAntiSteeringDataRequest
 
 
 class ImportFromFileFileTypes(Enum):
@@ -38,6 +40,7 @@ class ApiEndpoints:
     GET_LOAN_STATUSES: str = "get_loan_statuses"
     IMPORT_FROM_FILE: str = "import_from_file"
     IMPORT_FROM_FILE_WITH_DATE: str = "import_from_file_with_date"
+    SET_ANTI_STEERING_DATA: str = "set_anti_steering_data"
 
 
 class LoanClient(BaseClient):
@@ -120,4 +123,19 @@ class LoanClient(BaseClient):
         endpoint = ApiEndpoints.GET_LOAN_STATUSES
         response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
                             params=request_model.as_params_dict)
+        return response
+
+    def set_anti_steering_data(self, session_id, nonce, loan_number_id, index=None, program_id=None, rate=None,
+                               loan_origination=None, loan_discount=None, sales_price=None, value=None,
+                               base_loan_amount=None, other_financing=None, payload_dict=None):
+
+        request_model = SetAntiSteeringDataRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id,
+                                                   index=index, program_id=program_id, rate=rate, value=value,
+                                                   loan_discount=loan_discount, loan_origination=loan_origination,
+                                                   base_loan_amount=base_loan_amount, other_financing=other_financing,
+                                                   sales_price=sales_price, payload_dict=payload_dict)
+        response_model = SetAntiSteeringDataResponse
+        endpoint = ApiEndpoints.SET_ANTI_STEERING_DATA
+        response = self.post(resource_endpoint=endpoint, response_model=response_model, headers=None,
+                             params=request_model.as_params_dict, data=request_model.payload)
         return response

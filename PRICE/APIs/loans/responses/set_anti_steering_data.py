@@ -1,5 +1,5 @@
 from PRICE.base.common.response import CommonResponse
 
 
-class SetAntiSteeringData(CommonResponse):
+class SetAntiSteeringDataResponse(CommonResponse):
     pass
