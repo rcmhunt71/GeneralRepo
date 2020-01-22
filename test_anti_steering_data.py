@@ -1,7 +1,6 @@
 import unittest
 
 from APIs.loans.client import LoanClient
-from APIs.loans.requests.set_anti_steering_data import SetAntiSteeringDataKeys
 from tests.common_request_utils import RequestValidationTools
 from tests.common_response_args import CommonResponseValidations, response_args
 
@@ -40,6 +39,7 @@ class TestSetAntiSteeringDataClient(unittest.TestCase, CommonResponseValidations
                                                        loan_number_id="12345679", base_loan_amount=BASE_LOAN_AMOUNT,
                                                        other_financing=OTHER_FINANCING)
 
+        # Validation
         self.validate_payload(expected_dict=prebuilt_payload, actual_dict=client.payload)
         self._show_response(response_model=response_model)
         self._validate_response(model=response_model, model_data=set_anti_steering_data_args)
@@ -56,6 +56,7 @@ class TestSetAntiSteeringDataClient(unittest.TestCase, CommonResponseValidations
         response_model = client.set_anti_steering_data(session_id="123456789", nonce="DEADBEEF15DECEA5ED", rate=RATE,
                                                        loan_number_id="12345679", payload_dict=prebuilt_payload)
 
+        # Validation
         self.validate_payload(expected_dict=prebuilt_payload, actual_dict=client.payload)
         self._show_response(response_model=response_model)
         self._validate_response(model=response_model, model_data=set_anti_steering_data_args)

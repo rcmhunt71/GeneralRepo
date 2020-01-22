@@ -12,6 +12,7 @@ from PRICE.APIs.loans.responses.get_loan_license_data import GetLoanLicenseDataR
 from PRICE.APIs.loans.responses.get_loan_rate_quote_details import GetLoanRateQuoteDetailsResponse
 from PRICE.APIs.loans.responses.get_loan_statuses import GetLoanStatusesResponse
 from PRICE.APIs.loans.responses.set_anti_steering_data import SetAntiSteeringDataResponse
+from PRICE.APIs.loans.responses.set_loan_data import SetLoanDataResponse
 
 from PRICE.APIs.loans.requests.add_loan import ImportFromFileRequest, ImportFromFileWithDateRequest
 from PRICE.APIs.loans.requests.get_loan import GetLoanRequest, GetLoanDetailRequest, GetFinalValueTagsRequest
@@ -19,6 +20,7 @@ from PRICE.APIs.loans.requests.get_loan_license_data import GetLoanLicenseDataRe
 from PRICE.APIs.loans.requests.get_loan_rate_quote_details import GetLoanRateQuoteDetailsRequest
 from PRICE.APIs.loans.requests.get_loan_statuses import GetLoanStatusesRequest
 from PRICE.APIs.loans.requests.set_anti_steering_data import SetAntiSteeringDataRequest
+from PRICE.APIs.loans.requests.set_loan_data import SetLoanDataRequest
 
 
 class ImportFromFileFileTypes(Enum):
@@ -41,16 +43,19 @@ class ApiEndpoints:
     IMPORT_FROM_FILE: str = "import_from_file"
     IMPORT_FROM_FILE_WITH_DATE: str = "import_from_file_with_date"
     SET_ANTI_STEERING_DATA: str = "set_anti_steering_data"
-
+    SET_LOAN_DATA: str = "set_loan_data"
 
 class LoanClient(BaseClient):
+    CONTENT_TYPE = "Content-Type"
+    APPLICATION_JSON = "application/json"
 
     def add_loan(self, session_id, nonce):
         request_model = BaseRequestModel(session_id=session_id, nonce=nonce)
         response_model = AddALoanResponse
         endpoint = ApiEndpoints.ADD_A_LOAN
+        headers = {}
 
-        response = self.post(resource_endpoint=endpoint, response_model=response_model, data={},
+        response = self.post(resource_endpoint=endpoint, response_model=response_model, data={}, headers=headers,
                              params=request_model.as_params_dict)
         return response
 
@@ -60,8 +65,9 @@ class LoanClient(BaseClient):
                                               base64_file_data=base64_file_data)
         response_model = ImportFromFileResponse
         endpoint = ApiEndpoints.IMPORT_FROM_FILE
+        headers = {}
 
-        response = self.post(resource_endpoint=endpoint, response_model=response_model, data={},
+        response = self.post(resource_endpoint=endpoint, response_model=response_model, data={}, headers=headers,
                              params=request_model.as_params_dict, binary_data=base64_file_data)
         return response
 
@@ -71,8 +77,9 @@ class LoanClient(BaseClient):
                                                       upload_token=upload_token)
         response_model = ImportFromFileWithDateResponse
         endpoint = ApiEndpoints.IMPORT_FROM_FILE_WITH_DATE
+        headers = {}
 
-        response = self.post(resource_endpoint=endpoint, response_model=response_model, data={},
+        response = self.post(resource_endpoint=endpoint, response_model=response_model, data={}, headers=headers,
                              params=request_model.as_params_dict)
         return response
 
@@ -80,7 +87,9 @@ class LoanClient(BaseClient):
         request_model = GetLoanRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetLoanResponse
         endpoint = ApiEndpoints.GET_LOAN
-        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
+        headers = {}
+
+        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=headers,
                             params=request_model.as_params_dict)
         return response
 
@@ -88,7 +97,9 @@ class LoanClient(BaseClient):
         request_model = GetLoanDetailRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetLoanDetailResponse
         endpoint = ApiEndpoints.GET_LOAN_DETAIL
-        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
+        headers = {}
+
+        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=headers,
                             params=request_model.as_params_dict)
         return response
 
@@ -96,7 +107,9 @@ class LoanClient(BaseClient):
         request_model = GetFinalValueTagsRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetFinalValueTagsResponse
         endpoint = ApiEndpoints.GET_FINAL_VALUE_TAG
-        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
+        headers = {}
+
+        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=headers,
                             params=request_model.as_params_dict)
         return response
 
@@ -105,7 +118,9 @@ class LoanClient(BaseClient):
                                                   data_from=data_from, data_id=data_id)
         response_model = GetLoanLicenseDataResponse
         endpoint = ApiEndpoints.GET_LOAN_LICENSE_DATA
-        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
+        headers = {}
+
+        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=headers,
                             params=request_model.as_params_dict)
         return response
 
@@ -113,7 +128,9 @@ class LoanClient(BaseClient):
         request_model = GetLoanRateQuoteDetailsRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetLoanRateQuoteDetailsResponse
         endpoint = ApiEndpoints.GET_LOAN_RATE_QUOTE_DETAILS
-        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
+        headers = {}
+
+        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=headers,
                             params=request_model.as_params_dict)
         return response
 
@@ -121,7 +138,9 @@ class LoanClient(BaseClient):
         request_model = GetLoanStatusesRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
         response_model = GetLoanStatusesResponse
         endpoint = ApiEndpoints.GET_LOAN_STATUSES
-        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=None,
+        headers = {}
+
+        response = self.get(resource_endpoint=endpoint, response_model=response_model, headers=headers,
                             params=request_model.as_params_dict)
         return response
 
@@ -136,6 +155,21 @@ class LoanClient(BaseClient):
                                                    sales_price=sales_price, payload_dict=payload_dict)
         response_model = SetAntiSteeringDataResponse
         endpoint = ApiEndpoints.SET_ANTI_STEERING_DATA
-        response = self.post(resource_endpoint=endpoint, response_model=response_model, headers=None,
+        headers = {self.CONTENT_TYPE: self.APPLICATION_JSON}
+
+        response = self.post(resource_endpoint=endpoint, response_model=response_model, headers=headers,
+                             params=request_model.as_params_dict, data=request_model.payload)
+        return response
+
+    def set_loan_data(self, session_id, nonce, loan_number_id, payload_dict=None, **kwargs):
+        # For valid arguments, use lowercase name of attributes listed in API.loans.request.set_loan.SetLoanDataPayload
+
+        request_model = SetLoanDataRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id,
+                                           payload_dict=payload_dict, **kwargs)
+        response_model = SetLoanDataResponse
+        endpoint = ApiEndpoints.SET_LOAN_DATA
+        headers = {self.CONTENT_TYPE: self.APPLICATION_JSON}
+
+        response = self.post(resource_endpoint=endpoint, response_model=response_model, headers=headers,
                              params=request_model.as_params_dict, data=request_model.payload)
         return response
