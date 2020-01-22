@@ -1,8 +1,8 @@
+import typing
 import unittest
 
 from APIs.loans.client import LoanClient
-from APIs.loans.requests.set_loan_data import SetLoanDataRequest, SetLoanDataKeys, SetLoanDataPayload
-from APIs.loans.responses.set_loan_data import SetLoanDataResponse
+from APIs.loans.requests.set_loan_data import SetLoanDataKeys, SetLoanDataPayload
 from tests.common_request_utils import RequestValidationTools
 from tests.common_response_args import CommonResponseValidations, response_args
 
@@ -38,14 +38,19 @@ prebuilt_payload = {
 }
 
 
-def _build_payload():
+def _build_payload() -> typing.Dict[str, typing.List[typing.Dict[str, typing.Any]]]:
+    """
+    Build the expected payload format based on the data provided into the requesting client call.
+
+    :return: Dict of lists of key/value dicts (data)
+    """
     return {SetLoanDataKeys.LOAN_FIELDS:
                 [{SetLoanDataKeys.FIELD_NAME: getattr(SetLoanDataPayload, key.upper()),
                   SetLoanDataKeys.FIELD_VALUE: value} for key, value in prebuilt_payload.items()]}
 
 
 class TestSetLoanData(unittest.TestCase, RequestValidationTools, CommonResponseValidations):
-    def test_SetDataLoans_client(self):
+    def test_SetDataLoans_client(self) -> typing.NoReturn:
         # Build mock data to insert into client response
         set_loan_data_response = response_args.copy()
 
