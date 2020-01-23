@@ -45,6 +45,7 @@ class ApiEndpoints:
     SET_ANTI_STEERING_DATA: str = "set_anti_steering_data"
     SET_LOAN_DATA: str = "set_loan_data"
 
+
 class LoanClient(BaseClient):
     CONTENT_TYPE = "Content-Type"
     APPLICATION_JSON = "application/json"
@@ -125,7 +126,8 @@ class LoanClient(BaseClient):
         return response
 
     def get_loan_rate_quote_details(self, session_id, nonce, loan_number_id):
-        request_model = GetLoanRateQuoteDetailsRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id)
+        request_model = GetLoanRateQuoteDetailsRequest(session_id=session_id, nonce=nonce,
+                                                       loan_number_id=loan_number_id)
         response_model = GetLoanRateQuoteDetailsResponse
         endpoint = ApiEndpoints.GET_LOAN_RATE_QUOTE_DETAILS
         headers = {}
