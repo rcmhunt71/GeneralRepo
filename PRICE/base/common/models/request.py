@@ -8,7 +8,6 @@ class BaseRequestModelKeys:
     NONCE: str = "Nonce"
 
 
-@dataclass
 class BaseRequestModel:
     def __init__(self, session_id, nonce, payload=None):
         self.session_id = session_id

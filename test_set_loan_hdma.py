@@ -2,7 +2,7 @@ import typing
 import unittest
 
 from APIs.loans.client import LoanClient
-from APIs.loans.requests.set_loan_data import SetLoanDataKeys, SetLoanDataPayload
+from APIs.loans.requests.set_loan_hmda import SetLoanHDMAPayload, SetLoanHDMARequestKeys, SetLoanHDMADataKeys
 from tests.common_request_utils import RequestValidationTools
 from tests.common_response_args import CommonResponseValidations, response_args
 
@@ -17,24 +17,18 @@ PORT = 8080
 SESSION_ID = 123456789
 NONCE = "DEADBEEF15DECEA5ED"
 LOAN_NUMBER_ID = "45678524663"
-RATE = 0.04
-BASE_LOAN_AMOUNT = 100000
-RELOCATION = True
-FLOOD_ZONE = False
-LOCK_ID = "1234-4567"
-TITLE_CONTACT_ID = 123456
-TITLE_COMPANY_ID = 88667799
-LOAN_PROCESSOR_ID = 8675309
-LOAN_UNDERWRITER_ID = 10000001
+MSA = "HDMA MSA"
+CENSUS = "HMDA Census Data"
+OVERRIDE = True
+REASON_1 = "Because you are broke"
+REASON_2 = "Because the property is overvalued"
 
 prebuilt_payload = {
-    "flood_zone": FLOOD_ZONE,
-    "lock_type_id": LOCK_ID,
-    "relocation": RELOCATION,
-    "title_contact_id": TITLE_CONTACT_ID,
-    "title_company_id": TITLE_COMPANY_ID,
-    "loan_processor_id": LOAN_PROCESSOR_ID,
-    "loan_underwriter_id": LOAN_UNDERWRITER_ID,
+    "hmda_msa": MSA,
+    "hmda_census": CENSUS,
+    "hmda_2018_loan_purpose_override": OVERRIDE,
+    "hmda_2018_denial_reason_1": REASON_1,
+    "hmda_2018_denial_reason_2": REASON_2,
 }
 
 
@@ -44,13 +38,13 @@ def _build_payload() -> typing.Dict[str, typing.List[typing.Dict[str, typing.Any
 
     :return: Dict of lists of key/value dicts (data)
     """
-    return {SetLoanDataKeys.LOAN_FIELDS:
-                [{SetLoanDataKeys.FIELD_NAME: getattr(SetLoanDataPayload, key.upper()),
-                  SetLoanDataKeys.FIELD_VALUE: value} for key, value in prebuilt_payload.items()]}
+    return {SetLoanHDMADataKeys.LOAN_HDMA_FIELDS:
+                [{SetLoanHDMADataKeys.FIELD_NAME: getattr(SetLoanHDMAPayload, key.upper()),
+                  SetLoanHDMADataKeys.FIELD_VALUE: value} for key, value in prebuilt_payload.items()]}
 
 
 class TestSetLoanData(unittest.TestCase, RequestValidationTools, CommonResponseValidations):
-    def test_SetLoanData_client(self) -> typing.NoReturn:
+    def test_SetLoanHDMA_client(self) -> typing.NoReturn:
         # Build mock data to insert into client response
         set_loan_data_response = response_args.copy()
 
@@ -59,7 +53,7 @@ class TestSetLoanData(unittest.TestCase, RequestValidationTools, CommonResponseV
         client.insert_test_response_data(data=set_loan_data_response)
 
         # Make and validate client call
-        response_model = client.set_loan_data(session_id=SESSION_ID, nonce=NONCE, loan_number_id=LOAN_NUMBER_ID,
+        response_model = client.set_loan_hdma(session_id=SESSION_ID, nonce=NONCE, loan_number_id=LOAN_NUMBER_ID,
                                               **prebuilt_payload)
 
         # Validation

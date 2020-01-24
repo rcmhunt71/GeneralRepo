@@ -13,6 +13,7 @@ from PRICE.APIs.loans.responses.get_loan_rate_quote_details import GetLoanRateQu
 from PRICE.APIs.loans.responses.get_loan_statuses import GetLoanStatusesResponse
 from PRICE.APIs.loans.responses.set_anti_steering_data import SetAntiSteeringDataResponse
 from PRICE.APIs.loans.responses.set_loan_data import SetLoanDataResponse
+from PRICE.APIs.loans.responses.set_loan_hdma import SetLoanHDMAResponse
 
 from PRICE.APIs.loans.requests.add_loan import ImportFromFileRequest, ImportFromFileWithDateRequest
 from PRICE.APIs.loans.requests.get_loan import GetLoanRequest, GetLoanDetailRequest, GetFinalValueTagsRequest
@@ -21,6 +22,7 @@ from PRICE.APIs.loans.requests.get_loan_rate_quote_details import GetLoanRateQuo
 from PRICE.APIs.loans.requests.get_loan_statuses import GetLoanStatusesRequest
 from PRICE.APIs.loans.requests.set_anti_steering_data import SetAntiSteeringDataRequest
 from PRICE.APIs.loans.requests.set_loan_data import SetLoanDataRequest
+from PRICE.APIs.loans.requests.set_loan_hmda import SetLoanHDMARequest
 
 
 class ImportFromFileFileTypes(Enum):
@@ -44,7 +46,7 @@ class ApiEndpoints:
     IMPORT_FROM_FILE_WITH_DATE: str = "import_from_file_with_date"
     SET_ANTI_STEERING_DATA: str = "set_anti_steering_data"
     SET_LOAN_DATA: str = "set_loan_data"
-
+    SET_LOAN_HDMA: str = "set_loan_hdma"
 
 class LoanClient(BaseClient):
     CONTENT_TYPE = "Content-Type"
@@ -169,6 +171,19 @@ class LoanClient(BaseClient):
         request_model = SetLoanDataRequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id,
                                            payload_dict=payload_dict, **kwargs)
         response_model = SetLoanDataResponse
+        endpoint = ApiEndpoints.SET_LOAN_DATA
+        headers = {self.CONTENT_TYPE: self.APPLICATION_JSON}
+
+        response = self.post(resource_endpoint=endpoint, response_model=response_model, headers=headers,
+                             params=request_model.as_params_dict, data=request_model.payload)
+        return response
+
+    def set_loan_hdma(self, session_id, nonce, loan_number_id=None, payload_dict=None, **kwargs):
+        # For valid arguments, use lowercase name of attributes listed in API.loans.request.set_loan.SetLoanHDMARequest
+
+        request_model = SetLoanHDMARequest(session_id=session_id, nonce=nonce, loan_number_id=loan_number_id,
+                                           payload_dict=payload_dict, **kwargs)
+        response_model = SetLoanHDMAResponse
         endpoint = ApiEndpoints.SET_LOAN_DATA
         headers = {self.CONTENT_TYPE: self.APPLICATION_JSON}
 
