@@ -5,6 +5,7 @@ from PRICE.APIs.loans.client import LoanClient
 from PRICE.APIs.loans.models.license_data import License, LicenseInfoKeys, Licenses, LicenseDataKeys
 from PRICE.APIs.loans.requests.get_loan_license_data import UnknownDataFromTypeException, LoanLicenseDataFrom
 from PRICE.APIs.loans.responses.get_loan_license_data import GetLoanLicenseDataResponse
+from PRICE.APIs.loans.requests.set_loan_license_data import SetLoanLicenseDataParams
 
 from PRICE.logger.logging import Logger
 from PRICE.tests.common_response_args import CommonResponseValidations, response_args
@@ -19,6 +20,9 @@ BASE_URL = "auto.test.pclender.dom"
 DATABASE = "testset1"
 PORT = 8080
 
+NONCE = "DEADBEEF15DECEA5ED"
+SESSION_ID = 1232465798
+LOAN_NUMEBER_ID = f"{randrange(999999):06}"
 
 # --------------------------------------------------
 #             LOAN LICENSE DATA
@@ -107,8 +111,8 @@ class TestLoanLicenseClient(unittest.TestCase, CommonResponseValidations):
         client.insert_test_response_data(data=licenses_args)
 
         response_model = client.get_loan_license_data(
-            session_id="1232465798", nonce="DEADBEEF15DECEA5ED",
-            loan_number_id=f"{randrange(999999):06}", data_from=LoanLicenseDataFrom.LOAN_OFFICER.value,
+            session_id=SESSION_ID, nonce=NONCE,
+            loan_number_id=LOAN_NUMEBER_ID, data_from=LoanLicenseDataFrom.LOAN_OFFICER.value,
             data_id=randrange(99999999))
 
         self._show_response(response_model=response_model)
@@ -123,8 +127,29 @@ class TestLoanLicenseClient(unittest.TestCase, CommonResponseValidations):
 
         with self.assertRaises(UnknownDataFromTypeException):
             client.get_loan_license_data(
-                session_id="1232465798", nonce="DEADBEEF15DECEA5ED",
-                loan_number_id=f"{randrange(999999):06}", data_from=1001, data_id=randrange(99999999))
+                session_id=SESSION_ID, nonce=NONCE,
+                loan_number_id=LOAN_NUMEBER_ID, data_from=1001, data_id=randrange(99999999))
+
+    def test_SetLoanLicenseData_client(self):
+        license_args = response_args.copy()
+
+        params = {
+            'data_from': 2,
+            'license_id': 887766556,
+            'license_name': "TEST_License",
+            'license_number': 123456,
+            'license_state': "TX",
+        }
+
+        client = LoanClient(base_url=BASE_URL, database=DATABASE, port=PORT)
+        client.insert_test_response_data(data=license_args)
+        response_model = client.set_loan_license_data(
+            session_id=SESSION_ID, nonce=NONCE, loan_number_id=LOAN_NUMEBER_ID, **params)
+        self._validate_response(model=response_model, model_data=license_args)
+
+        param_str = "&".join([f"{getattr(SetLoanLicenseDataParams, key.upper())}={value}" for key, value
+                              in params.items()])
+        self.assertIn(param_str, response_model.response.params)
 
 
 if __name__ == '__main__':
