@@ -38,15 +38,17 @@ prebuilt_payload = {
 }
 
 
-def _build_payload() -> typing.Dict[str, typing.List[typing.Dict[str, typing.Any]]]:
+def _build_payload(args_dict: typing.Dict[str, typing.Any]) -> typing.Dict[
+    str, typing.List[typing.Dict[str, typing.Any]]]:
     """
     Build the expected payload format based on the data provided into the requesting client call.
 
+    :param args_dict: Dictionary of the payload data arguments
     :return: Dict of lists of key/value dicts (data)
     """
     return {SetLoanDataKeys.LOAN_FIELDS:
                 [{SetLoanDataKeys.FIELD_NAME: getattr(SetLoanDataPayload, key.upper()),
-                  SetLoanDataKeys.FIELD_VALUE: value} for key, value in prebuilt_payload.items()]}
+                  SetLoanDataKeys.FIELD_VALUE: value} for key, value in args_dict.items()]}
 
 
 class TestSetLoanData(unittest.TestCase, RequestValidationTools, CommonResponseValidations):
@@ -63,7 +65,7 @@ class TestSetLoanData(unittest.TestCase, RequestValidationTools, CommonResponseV
                                               **prebuilt_payload)
 
         # Validation
-        self.validate_payload(expected_dict=_build_payload(), actual_dict=client.payload)
+        self.validate_payload(expected_dict=_build_payload(prebuilt_payload), actual_dict=client.payload)
         self._show_response(response_model=response_model)
         self._validate_response(model=response_model, model_data=set_loan_data_response)
 

@@ -15,6 +15,7 @@ from PRICE.APIs.loans.responses.set_anti_steering_data import SetAntiSteeringDat
 from PRICE.APIs.loans.responses.set_loan_data import SetLoanDataResponse
 from PRICE.APIs.loans.responses.set_loan_hdma import SetLoanHDMAResponse
 from PRICE.APIs.loans.responses.set_loan_license_data import SetLoanLicenseDataResponse
+from PRICE.APIs.loans.responses.set_loan_rate_quote_details import SetLoanQuoteRateDetailsResponse
 
 from PRICE.APIs.loans.requests.add_loan import ImportFromFileRequest, ImportFromFileWithDateRequest
 from PRICE.APIs.loans.requests.get_loan import GetLoanRequest, GetLoanDetailRequest, GetFinalValueTagsRequest
@@ -25,6 +26,7 @@ from PRICE.APIs.loans.requests.set_anti_steering_data import SetAntiSteeringData
 from PRICE.APIs.loans.requests.set_loan_data import SetLoanDataRequest
 from PRICE.APIs.loans.requests.set_loan_hmda import SetLoanHDMARequest
 from PRICE.APIs.loans.requests.set_loan_license_data import SetLoanLicenseDataRequest
+from PRICE.APIs.loans.requests.set_loan_rate_quote_data import SetLoanQuoteRateDataRequest
 
 
 class ImportFromFileFileTypes(Enum):
@@ -50,6 +52,7 @@ class ApiEndpoints:
     SET_LOAN_DATA: str = "set_loan_data"
     SET_LOAN_HDMA: str = "set_loan_hdma"
     SET_LOAN_LICENSE_DATA: str = "set_loan_license_data"
+    SET_LOAN_RATE_QUOTE_DETAILS: str = "set_loan_rate_quote_details"
 
 
 class LoanClient(BaseClient):
@@ -203,6 +206,17 @@ class LoanClient(BaseClient):
             session_id=session_id, nonce=nonce, loan_number_id=loan_number_id, **kwargs)
         response_model = SetLoanLicenseDataResponse
         endpoint = ApiEndpoints.SET_LOAN_LICENSE_DATA
+
+        response = self.post(resource_endpoint=endpoint, response_model=response_model,
+                             params=request_model.as_params_dict, data=request_model.payload)
+        return response
+
+    def set_loan_rate_quote_data(self, session_id, nonce, vendor_name, loan_number_id, **kwargs):
+        request_model = SetLoanQuoteRateDataRequest(
+            session_id=session_id, nonce=nonce, vendor_name=vendor_name, loan_number_id=loan_number_id,
+            **kwargs)
+        response_model = SetLoanQuoteRateDetailsResponse
+        endpoint = ApiEndpoints.SET_LOAN_RATE_QUOTE_DETAILS
 
         response = self.post(resource_endpoint=endpoint, response_model=response_model,
                              params=request_model.as_params_dict, data=request_model.payload)
