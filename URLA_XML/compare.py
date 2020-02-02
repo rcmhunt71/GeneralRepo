@@ -31,13 +31,10 @@ class CLIArgs:
             "-c", "--compare", required=True,
             help="MISMO formatted XML file to verify against source XML file")
         self.parser.add_argument(
-            "-d", "--detail", action="store_true",
-            help="[OPTIONAL] Display comparison details. Default: False (only shows summary)")
-        self.parser.add_argument(
             "-o", "--outfile", action="store_true",
             help="[OPTIONAL] Create outfile of XML to dict conversion processes (for debugging)")
         self.parser.add_argument(
-            "-x", "--debug", action="store_true",
+            "-d", "--debug", action="store_true",
             help="[OPTIONAL] Enable debug logging."
         )
 
