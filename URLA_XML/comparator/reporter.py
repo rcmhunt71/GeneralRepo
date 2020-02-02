@@ -126,9 +126,10 @@ class ComparisonReportEngine:
 
                     # Partial match identified
                     if data[ComparisonEngine.CLOSEST_OBJ] is not None:
+                        diff_val = abs(data[ComparisonEngine.TOTAL] - data[ComparisonEngine.CLOSEST_MATCH_COUNT])
                         closest_match = (f"{data[ComparisonEngine.CLOSEST_OBJ].xpath_str} "
                                          f"({data[ComparisonEngine.CLOSEST_MATCH_COUNT]}/{data[ComparisonEngine.TOTAL]}"
-                                         f" matches)")
+                                         f" matches; {diff_val} diffs)")
                 # Build row
                 table.add_row([xpath, exact_match, closest_match])
 
