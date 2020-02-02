@@ -1,5 +1,5 @@
-import typing
 from collections import OrderedDict
+import typing
 
 from models.urla_xml_keys import UrlaXmlKeys
 
@@ -15,9 +15,10 @@ class BaseElement:
     ENTRY_DELIMITER = ":"
 
     def __init__(self, data: OrderedDict, parent: typing.Optional["BaseElement"] = None,
-                 element_type: str = None, index: int = None):
+                 element_type: str = None, index: int = None) -> typing.NoReturn:
         """
-        Instantiate and populate BaseElement
+        Instantiate and populate BaseElement. A BaseElement is the basic building block of translating the
+        OrderedDict results generated from XMLtoDict to an object model.
 
         :param data: OrderDict of XML (created from XmlToDict library)
         :param parent: This object's Parent BaseElement
@@ -73,15 +74,39 @@ class BaseElement:
             self.path_dict = self.build_element_paths_dict()
 
     @property
-    def obj_path_str(self):
+    def obj_path_str(self) -> str:
+        """
+        Build the obj_path list as a string (using the XPATH_DELIMITER)
+
+        Example: Given the obj_path: [TAG_1, TAG_2, TAG_3, ..., TAG_N)
+        Result: TAG_1/TAG_2/TAG_3/.../TAG_N
+
+        :return: str value of list.
+        """
         return self.XPATH_DELIMITER.join(self.obj_path)
 
     @property
-    def xpath_str(self):
+    def xpath_str(self) -> str:
+        """
+        Build the xpath list as a string (using the XPATH_DELIMITER)
+
+        Example: Given the xpath: [TAG_1, TAG_2, TAG_3, ..., TAG_N)
+        Result: TAG_1/TAG_2/TAG_3/.../TAG_N
+
+        :return: str value of list.
+        """
         return self.XPATH_DELIMITER.join(self.xpath)
 
     @property
-    def traversal_list_str(self):
+    def traversal_list_str(self) -> str:
+        """
+        Build the traversal_path list as a string (using the XPATH_DELIMITER)
+
+        Example: Given the traversal_path: [TAG_1, TAG_2, TAG_3, ..., TAG_N)
+        Result: TAG_1/TAG_2/TAG_3/.../TAG_N
+
+        :return: str value of list.
+        """
         return self.XPATH_DELIMITER.join(self.traversal_list)
 
     def get_children_by_type(self, child_type: str) -> typing.List["BaseElement"]:
@@ -100,9 +125,12 @@ class BaseElement:
         :return: None
         """
         for child_type, child_data in [(key, value) for key, value in self.data.items()]:
+
+            # If ordered dictionary...
             if isinstance(child_data, OrderedDict):
                 self.children.append(BaseElement(data=child_data, element_type=child_type, parent=self))
 
+            # If list...
             elif isinstance(child_data, list):
                 for index, child_element in enumerate(child_data):
                     self.children.append(
@@ -122,6 +150,12 @@ class BaseElement:
                        not isinstance(value, list)])
 
     def __str__(self, index: int = 0) -> str:
+        """
+        Representation of Object if cast to a string.
+        :param index: Used to recurse child elements (not needed for initial call)
+        :return: Str representation of obj
+
+        """
         border_length = 120
         tabs = "\t" * index
         elem_idx = f"[{self.index}]" if self.index is not None else ""
@@ -144,23 +178,22 @@ class BaseElement:
         :return: Dictionary of elements, value equals list of elements required to reach key element.
 
         """
-        # If first value in structure, initialize the path dictionary
+        # If first value in the structure, initialize the path dictionary.
         if paths is None:
             paths = {self.type: [self.traversal_list_str]}
 
+        # New element type... don't include the current element, which will be the last element in the list
         elif self.type not in paths:
-            # New element type
-            # Don't include the current element, which will be the last element in the list
             paths[self.type] = [self.traversal_list_str]
 
         elif self.type in paths:
-            # existing element type, check if the current path is in list.
-            # if not, append it to the list
+            # Element type exists in the list, check if the current type is in the traversal list.
+            # if not, append it to the list.
             if self.traversal_list_str not in paths[self.type]:
                 paths[self.type].append(self.traversal_list_str)
 
+        # Iterate through the children, gathering their paths
         for child in self.children:
-            # Iterate through the children
             paths = child.build_element_paths_dict(paths=paths)
 
         return paths

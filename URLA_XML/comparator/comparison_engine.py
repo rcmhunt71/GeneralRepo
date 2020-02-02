@@ -18,30 +18,41 @@ class ComparisonEngine:
     HEADER_LENGTH = 120
 
     def __init__(self, primary: UrlaXML, comparison: UrlaXML) -> typing.NoReturn:
+        """
+        Instantiate the Comparison Engine
+
+        :param primary: Primary Model (model that should be correct)
+        :param comparison: Source of Truth (compare primary to this and report results)
+
+        """
         self.primary = primary
         self.comparison = comparison
 
-    def compare(self, element_name: str) -> typing.Dict[str, dict]:
+    def compare(self, tag_name: str) -> typing.Dict[str, dict]:
         """
+        Compare the source/comparison models for the provided tag
 
-        :param element_name:
-        :return:
+        :param tag_name: XML tag (+ descendants) to compare.
+
+        :return: Results dictionary: for each tag of type 'tag_name' found, indicate if there was an exact match,
+                 a close match (and how close), and links to current and corresponding XML node BaseElement models.
         """
-        if element_name not in self.primary.model.path_dict.keys():
-            log.error(f"ERROR: Element '{element_name}' not found in the primary model. Available elements:")
+        # If the tag is not found in the primary model, there is nothing to do.
+        if tag_name not in self.primary.model.path_dict.keys():
+            log.error(f"ERROR: Element '{tag_name}' not found in the primary model. Available elements:")
             log.error(sorted(list(self.primary.model.path_dict.keys())))
             return {}
 
-        for line in self._build_log_header(f"Comparing element: '{element_name}'"):
-            log.info(line)
+        # Log the "boxed" tag section header to record what is being evaluated.
+        log.info(self._build_log_header(f"Comparing element: '{tag_name}'"))
 
         # Get the target nodes from each XML file
         log.debug(f"Getting SRC NODES")
-        src_nodes = self.get_elements(element_name=element_name, root=self.primary.model)
-
+        src_nodes = self.get_elements(element_name=tag_name, root=self.primary.model)
         log.debug(f"Getting CMP NODES")
-        cmp_nodes = self.get_elements(element_name=element_name, root=self.comparison.model)
+        cmp_nodes = self.get_elements(element_name=tag_name, root=self.comparison.model)
 
+        # Do analysis and return results
         return self._compare_element_lists(source_list=src_nodes, compare_list=cmp_nodes)
 
     def _compare_element_lists(self, source_list: typing.List[BaseElement],
@@ -63,7 +74,6 @@ class ComparisonEngine:
         # Key: The XPATH for each target
         # Values: SRC = complete source structure underneath the target
         #         MATCH: Matching Node
-        #
         results_dict = dict(
             [(src.xpath_str, {self.SRC_OBJ: src,
                               self.MATCH: None,
@@ -78,25 +88,33 @@ class ComparisonEngine:
             for cmp_node in compare_list:
                 log.debug(f"COMPARISON NODE XPATH: {cmp_node.xpath_str}")
 
-                # Don't compare if match has been found
+                # Don't compare this comparison node if the comparison node has already been matched.
                 if cmp_node.xpath_str in cmp_match_found:
-                    log.debug(f"COMPARISON NODE ({cmp_node.xpath_str}) ALREADY MATCHED")
+                    log.debug(f"COMPARISON NODE ({cmp_node.xpath_str}) ALREADY MATCHED.")
                     continue
 
                 # If the src node matches current cmp node, then compare elements (including children)
+                # Match = data elements match + same number of children
                 if self._compare_node(src_node=src_node, cmp_node=cmp_node):
-                    log.debug(f"CMP node matches (attr + #_child): {cmp_node.xpath_str} "
-                              f"-> Checking descendants...")
+                    log.debug(f"CMP node matches (attr + #_child): {cmp_node.xpath_str} -> Checking descendants...")
+
+                    # Get all descendant nodes (down to the leaf elements)
                     src_children = self.get_leaf_nodes(src_node)
                     cmp_children = self.get_leaf_nodes(cmp_node)
 
+                    # For a detailed analyses, expand the data nodes to be separate XPATH entries
+                    # By default, all data nodes are combined with the parent for quicker comparison of nodes
+                    # with children and data, but in this case, it will provide a less accurate comparison.
                     src_child_set = self._expand_objpath_pathsets(children=src_children)
                     cmp_child_set = self._expand_objpath_pathsets(children=cmp_children)
-                    max_count = self._get_max_unique_count(set_1=src_child_set, set_2=cmp_child_set)
 
                     log.debug(f"EXPANDED SOURCE OBJ_PATH SET:\n{pprint.pformat(src_child_set)}")
                     log.debug(f"EXPANDED COMPARISON OBJ_PATH SET:\n{pprint.pformat(cmp_child_set)}")
 
+                    # Determine the total number of unique xpaths/traversal paths in this comparison
+                    max_count = self._get_max_unique_count(set_1=src_child_set, set_2=cmp_child_set)
+
+                    # Exact match
                     if src_child_set == cmp_child_set:
                         log.debug(f"**MATCH**: {src_node.xpath_str} and {cmp_node.xpath_str}")
                         results_dict[src_node.xpath_str][self.MATCH] = cmp_node
@@ -106,56 +124,85 @@ class ComparisonEngine:
                         cmp_match_found.append(cmp_node.xpath_str)
                         break
 
+                    # Check if this cmp node is the closest match compared to previous comparisons.
+                    # If so, store the cmp_node (BaseElement), number of matches, + total number of compared elements.
                     else:
+                        log.debug(f"DID NOT MATCH: {src_node.xpath_str} and {cmp_node.xpath_str}")
+
                         num_matches = len(src_child_set.intersection(cmp_child_set))
                         if num_matches > results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT]:
                             results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT] = num_matches
                             results_dict[src_node.xpath_str][self.CLOSEST_OBJ] = cmp_node
                             results_dict[src_node.xpath_str][self.TOTAL] = max_count
 
-                        log.debug(f"DID NOT MATCH: {src_node.xpath_str} and {cmp_node.xpath_str}")
-
-                        matches = src_child_set.intersection(cmp_child_set)
-                        s_differences = src_child_set.symmetric_difference(cmp_child_set)
-                        for match in matches:
-                            log.debug(f"MATCHED: {match}")
-
-                        for miss in sorted(s_differences):
-                            target = "SRC" if miss in src_child_set else "CMP"
-                            log.debug(f"{target}: {miss}")
-                    log.debug("")
-
+                # C0mp node did not match the source node (in format/size), so move to the next comp node.
                 else:
                     log.debug("SRC node and CMP node did not match (attributes and number of children)")
-                    log.debug("")
+                log.debug("")
 
         self._debug_print_results(results_dict)
         return results_dict
 
     @staticmethod
     def _get_max_unique_count(set_1: typing.Set[str], set_2: typing.Set[str]) -> int:
+        """
+        Get the unique tag xpath count. This requires looking at all obj_paths without the data values (which are
+        stored as part of the obj_path)
+        :param set_1: Set of obj_paths
+        :param set_2: Set of obj_paths
+
+        :return: Number of unique obj_paths contained between the two sets
+
+        """
 
         def _build_value(entry_str):
-            path_segment, attribute = entry_str.split(BaseElement.OBJ_PATH_DELIMITER)
-            attr = attribute.split(BaseElement.ENTRY_DELIMITER)[0]
+            """
+            Quick string processing routine (specific to singular BaseElement entity storage)
+            :param entry_str: entity string (traversal_path|attribute_key:entity_value)
+
+            :return: String of traversal_path|entity_key
+
+            """
+            path_segment, entity = entry_str.split(BaseElement.OBJ_PATH_DELIMITER)
+            attr = entity.split(BaseElement.ENTRY_DELIMITER)[0]
             return BaseElement.OBJ_PATH_DELIMITER.join([path_segment, attr])
 
+        # Accumulate all traversal_paths (without data value) down to each leaf node
         total_list = [_build_value(item) for item in set_1]
         total_list.extend([_build_value(item) for item in set_2])
+
+        # Return the number of unique traversal_paths
         return len(set(total_list))
 
     @staticmethod
-    def _expand_objpath_pathsets(children: typing.List[BaseElement]):
+    def _expand_objpath_pathsets(children: typing.List[BaseElement]) -> typing.Set[str]:
+        """
+        BaseElement obj_paths contain the traversal_path and all leaf data:value nodes.
+        For a better comparison, break the obj_path into individual traversal_path + single leaf
+        data:value node entities.
+
+        :param children: BaseElement child nodes of current parent
+
+        :return: Set of unique traversal_path + single leaf data:value node entities.
+
+        """
         final_list = []
+
+        # Get list of all traversal_paths
         starting_list = [x.obj_path_str for x in children]
+
+        # Break each traversal_path|[entity_key:value] into individual path|entity:value strings
         for path in starting_list:
+
+            # If the traversal_path has attribute
             if BaseElement.OBJ_PATH_DELIMITER in path:
                 parts = path.split(BaseElement.OBJ_PATH_DELIMITER)
                 current_path = parts.pop(0)
-                for attribute in parts:
-                    final_list.append(BaseElement.OBJ_PATH_DELIMITER.join([current_path, attribute]))
+                final_list.extend([BaseElement.OBJ_PATH_DELIMITER.join([current_path, entity]) for entity in parts])
             else:
                 final_list.append(path)
+
+        # Return all unique paths (as a set)
         return set(final_list)
 
     @classmethod
@@ -202,8 +249,7 @@ class ComparisonEngine:
         :return: List of nodes underneath the relative root
 
         """
-
-        # Get the XPATH that corresponds to the element name
+        # Get the XPATH tag list that corresponds to the final destination tag name
         paths = root.path_dict[element_name]
 
         log.debug(f"List of XPath(s) to '{element_name}': {paths}")
@@ -214,11 +260,13 @@ class ComparisonEngine:
         log.debug(f"RESULTS: {[x.xpath_str for x in results]}")
         return results
 
-    def _get_elements(self, path: typing.List[str], starting_node: BaseElement) -> typing.List[BaseElement]:
+    def _get_elements(self, starting_node: BaseElement, path: typing.List[str]) -> typing.List[BaseElement]:
         """
-        Get the element(s) under the specified path
-        :param path: List of node types required to create the path to the target node.
-        :param starting_node: Node used to start the retrieval process
+        Get the element(s) under the specified path (through recursive calls --> depth first strategy)
+
+        :param starting_node: Node (relative root) used to start the retrieval process
+        :param path: List of node types required to create the path to the target node:
+                if the path = TAG1/TAG2/TAG3/TAG4, the path will be [TAG1, TAG2, TAG3, TAG4]
 
         :return: List of Elements
 
@@ -232,10 +280,14 @@ class ComparisonEngine:
             log.debug(f"Rec'd Starting Node: {starting_node.type} --> '{starting_node.name}'")
             log.debug(f"Current Type to look for: {current_type}\n")
 
+        # Get all child nodes that match the requested type
         matching_child_nodes = starting_node.get_children_by_type(child_type=current_type)
 
-        # If the current node type matches the desired type and there are no more nodes in the path, return the node
+        # If the current matching node type matches the desired type and there are no more nodes in the path,
+        # save the node
         if matching_child_nodes:
+
+            # If there are no more nodes to traverse beyond the current node, return
             if len(path) == 1:
 
                 log.debug(f"Node type ({starting_node.type}) has children of current type ({current_type}) "
@@ -268,16 +320,24 @@ class ComparisonEngine:
                                   f"{data[self.CLOSEST_MATCH_COUNT]} descendant(s) matching.")
             log.debug(debug_msg)
 
-    def _build_log_header(self, tag: str) -> typing.List[str]:
+    def _build_log_header(self, tag: str) -> str:
         """
+        Builds a header string centered around the provided text
 
-        :param tag:
-        :return:
+        Example:
+            +================+
+            |     <tag>      |
+            +================+
+
+        :param tag: Name of tag (or text) to encase in a header
+        :return: string of header (with embedded <cr>)
+
         """
-        border = "=" * self.HEADER_LENGTH
+        border_char = "-"
+        border = border_char * self.HEADER_LENGTH
 
         header = "{{tag:^{entry_length}}}".format(entry_length=self.HEADER_LENGTH)
         header = header.format(tag=tag)
-        return [f"+{border}+",
-                f"|{header}|",
-                f"+{border}+"]
+        return (f"+{border}+\n"
+                f"|{header}|\n"
+                f"+{border}+\n")

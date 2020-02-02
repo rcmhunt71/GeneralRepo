@@ -5,7 +5,7 @@ import pprint
 import typing
 
 from comparator.comparison_engine import ComparisonEngine
-from comparator.reporter import ComparisonReport
+from comparator.reporter import ComparisonReportEngine
 from logger.logging import Logger
 from models.urla_xml_model import UrlaXML
 
@@ -16,7 +16,6 @@ class CLIArgs:
     """
     CLI Arguments available for this application.
     See _defined_args for list and description of the available arguments
-
     """
 
     def __init__(self) -> typing.NoReturn:
@@ -94,26 +93,34 @@ def write_debug_files(source_obj: UrlaXML, compare_obj: UrlaXML) -> typing.NoRet
     compare_obj.dump_data_to_file(outfile=out_compare_file_spec, data_dict=compare_dict_info)
 
 
-def build_log_filename(src: str, dst: str, target_dir='.') -> str:
+def build_log_filespec(src: str, dst: str, target_dir='.') -> str:
+    """
+    Builds the logfile dir+name by combining the source file names (no ext) and adding a log file extension.
+    :param src: Source XML file
+    :param dst: Comparison XML file
+    :param target_dir: directory to write file (relative or absolute directory path)
+
+    :return: new log file spec
+    """
+    extension = "log"
     src_portion = ".".join(src.split(os.path.sep)[-1].split(".")[:-1])
     dst_portion = ".".join(dst.split(os.path.sep)[-1].split(".")[:-1])
-    return os.path.abspath(os.path.sep.join([target_dir, f"comp_{src_portion}_{dst_portion}.log"]))
+
+    return os.path.abspath(os.path.sep.join([target_dir, f"comp_{src_portion}_{dst_portion}.{extension}"]))
 
 
 if __name__ == '__main__':
 
-    VISUAL = False
-    COMPARE = True
-
     # Parse CLI args
     cli = CLIArgs()
 
-    log_filename = build_log_filename(src=cli.args.source, dst=cli.args.compare)
+    # Build logfile file spec and instantiate logger
+    log_filename = build_log_filespec(src=cli.args.source, dst=cli.args.compare)
     print(f"Logging to: {log_filename}.")
     log = Logger(default_level=Logger.DEBUG if cli.args.debug else Logger.INFO,
                  set_root=True, project="FiServ", filename=log_filename)
 
-    # Create URLA XML Objects (read file, convert to nested OrderedDict structure)
+    # Create URLA XML objects (read file, convert to nested OrderedDict structure)
     source = UrlaXML(source_file_name=cli.args.source, primary_source=True)
     compare = UrlaXML(source_file_name=cli.args.compare, primary_source=False)
 
@@ -121,13 +128,16 @@ if __name__ == '__main__':
     if cli.args.outfile:
         write_debug_files(source_obj=source, compare_obj=compare)
 
-    reports = ComparisonReport(src_model=source.model, cmp_model=compare.model)
+    # Instantiate report generator
+    reports = ComparisonReportEngine(src_model=source.model, cmp_model=compare.model)
 
+    # Instantiate comparison engine
     comp_eng = ComparisonEngine(primary=source, comparison=compare)
-    ATTR_LIST = ["ASSET", "COLLATERAL", "EXPENSE", "LIABILITY", "LOAN", "PARTY"]
-    for attr in ATTR_LIST:
-        results = comp_eng.compare(attr)
-        log.info(reports.comparison_summary(title=f"*** ELEMENT TAG: <{attr}> ***", results=results))
-        log.info(reports.closest_match_info(results=results))
 
+    # Do comparison on the following tags and generate result reports
+    TAG_LIST = ["ASSET", "COLLATERAL", "EXPENSE", "LIABILITY", "LOAN", "PARTY"]
+    for tag in TAG_LIST:
+        results = comp_eng.compare(tag_name=tag)
+        log.info(reports.comparison_summary(title=f"*** ELEMENT TAG: <{tag}> ***", results=results))
+        log.info(reports.closest_match_info(results=results))
     log.info(f"\n{reports.symmetrical_differences()}\n")

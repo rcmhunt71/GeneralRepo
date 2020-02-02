@@ -1,6 +1,6 @@
+from collections import OrderedDict
 import os
 import typing
-from collections import OrderedDict
 
 import xmltodict
 from models.element_base_model import BaseElement
@@ -20,6 +20,11 @@ class UrlaXML:
         self.model = BaseElement(data=self.data)
 
     def read_file(self, filename: str) -> typing.List[str]:
+        """
+        Read the specified file and return the contents as a list of lines.
+        :param filename: Name (& diirectory) of target file
+        :return: List of strings (file content, per line)
+        """
         file_type = "primary" if self.primary_source else "comparison"
         print(f"Reading {file_type} file: '{os.path.abspath(filename)}'")
         with open(filename, "r") as FILE:
@@ -29,9 +34,7 @@ class UrlaXML:
         """
         Reads XML and converts the contents to a nested collections.OrderedDict
         :param file_spec: filespec of the input XML file.
-
         :return: OrderedDict representation of the XML.
-
         """
         if not os.path.exists(file_spec):
             raise FileNotFoundError(f"XML Source file ('{file_spec}') was not found.")
@@ -45,9 +48,7 @@ class UrlaXML:
         Write the OrderedDict to file (as a string)
         :param outfile: file spec of the file to dump contents
         :param data_dict: OrderedDict to write to file
-
         :return: None
-
         """
         with open(outfile, "w") as OUT:
             OUT.writelines(data_dict)

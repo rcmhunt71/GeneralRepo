@@ -12,7 +12,7 @@
 import inspect
 import logging
 import os
-from typing import List, Optional, Any
+import typing
 
 try:
     import prettytable
@@ -21,13 +21,20 @@ except ModuleNotFoundError:
     pretty_table = False
 
 
-# TODO: <DOC> Add README.md to directory
-
 class ContextAdapter(logging.LoggerAdapter):
 
     PROJECT = 'site-packages'
 
-    def process(self, msg, kwargs):
+    def process(
+            self, msg: str, kwargs: typing.Dict[str, typing.Any]) -> typing.Tuple[str, typing.Dict[str, typing.Any]]:
+        """
+        Process key info to build message.
+        :param msg: Raw message (without preamble)
+        :param kwargs: other args
+
+        :return: Tuple of updated msg (with preamble) and other args.
+
+        """
         depth = kwargs.pop('depth', self.extra['depth']) + 3
         project = kwargs.pop('project', self.extra['project'])
         filename, line_num, routine, pid = self._method(depth, project)
@@ -48,7 +55,7 @@ class ContextAdapter(logging.LoggerAdapter):
         """
         return str(path.split('.')[0]).replace(os.path.sep, ".")
 
-    def _method(self, depth, project) -> tuple:
+    def _method(self, depth: int, project: str) -> typing.Tuple[str, int, str, int]:
         """
         Get calling frame's basic info
         + File name relative to project name
@@ -130,9 +137,9 @@ class Logger:
     ROOT_LOGGER = 'root'
 
     def __init__(
-            self, filename: Optional[str] = None, default_level: Any = None,
-            added_depth: int = 0, project: Optional[str] = None, set_root: bool = False,
-            test_name: Optional[str] = None) -> None:
+            self, filename: typing.Optional[str] = None, default_level: typing.Any = None,
+            added_depth: int = 0, project: typing.Optional[str] = None, set_root: bool = False,
+            test_name: typing.Optional[str] = None) -> typing.NoReturn:
         """
         :param filename: Filename to write logs to...
         :param default_level: Default stack level (default = DEFAULT_STACK_DEPTH)
@@ -189,7 +196,7 @@ class Logger:
             # Start the logger for the given module.
             self._start_logger()
 
-    def _start_logger(self) -> None:
+    def _start_logger(self) -> typing.NoReturn:
         """
         Define the logger for the current context.
           + Set the default logging level
@@ -235,7 +242,7 @@ class Logger:
             print(f"Configured Logger: {self.name}")
 
     @staticmethod
-    def determine_project():
+    def determine_project() -> str:
         """
         Determines the name of the project based on the file invoking the call.
         Assumes direct call and not a call made within a routine in the application.
@@ -248,7 +255,7 @@ class Logger:
         filename_parts = filename.split(os.path.sep)
         return os.path.sep.join(filename_parts[:-1])
 
-    def _add_console(self) -> None:
+    def _add_console(self) -> typing.NoReturn:
         """
         Enables a stream handler for logging to the console (STDOUT).
         This is used when a log file is specified, because all log output is
@@ -273,7 +280,7 @@ class Logger:
 
         return self._translate_to_dotted_lib_path(filename)
 
-    def _log_at_level(self, level: str, msg: str, prefix: str = '') -> None:
+    def _log_at_level(self, level: str, msg: str, prefix: str = '') -> typing.NoReturn:
         """
         Determine and use the proper logging level (abstracted to expose logging
         routines at class level; also reduces the dotted path when invoking in
@@ -289,7 +296,7 @@ class Logger:
         for line in msg.split('\n'):
             log_routine(str(prefix) + str(line), extra=self._method())
 
-    def _list_loggers(self) -> List[List[str]]:
+    def _list_loggers(self) -> typing.List[typing.List[str]]:
         """
         Lists all child loggers defined under the root logger, and effective
         logging levels
@@ -350,7 +357,7 @@ class Logger:
 
         return table_str
 
-    def _get_logger_info(self, name: str) -> List[str]:
+    def _get_logger_info(self, name: str) -> typing.List[str]:
         """
         Gets the effective log level for the given name
         :param name: Name of the logging facility/child
@@ -373,7 +380,7 @@ class Logger:
         """
         return str(path.split('.')[0]).replace(os.path.sep, ".")
 
-    def _method(self) -> dict:
+    def _method(self) -> typing.Dict[str, typing.Any]:
         """
         Get calling frame's basic info
         + File name relative to project name
@@ -398,7 +405,7 @@ class Logger:
     # ==> Simplification from obj.log.log_level() to obj.log_level()
     # ------------------------------------------------------------------
 
-    def critical(self, msg: str = '') -> None:
+    def critical(self, msg: str = '') -> typing.NoReturn:
         """
         Shortcut to logging.critical() logging call
         :param msg: Message to log
@@ -408,7 +415,7 @@ class Logger:
         """
         self._log_at_level(level='CRITICAL', msg=msg)
 
-    def error(self, msg: str = '') -> None:
+    def error(self, msg: str = '') -> typing.NoReturn:
         """
         Shortcut to logging.error() logging call
         :param msg: Message to log
@@ -418,7 +425,7 @@ class Logger:
         """
         self._log_at_level(level='ERROR', msg=msg)
 
-    def warn(self, msg: str = '') -> None:
+    def warn(self, msg: str = '') -> typing.NoReturn:
         """
         Shortcut to logging.warn() logging call
         :param msg: Message to log
@@ -428,7 +435,7 @@ class Logger:
         """
         self._log_at_level(level='WARN', msg=msg)
 
-    def warning(self, msg: str = '') -> None:
+    def warning(self, msg: str = '') -> typing.NoReturn:
         """
         Shortcut to logging.warn() logging call
         :param msg: Message to log
@@ -438,7 +445,7 @@ class Logger:
         """
         self.warn(msg)
 
-    def info(self, msg: str = '') -> None:
+    def info(self, msg: str = '') -> typing.NoReturn:
         """
         Shortcut to logging.info() logging call
         :param msg: Message to log
@@ -448,7 +455,7 @@ class Logger:
         """
         self._log_at_level(level='INFO', msg=msg)
 
-    def debug(self, msg: str = '') -> None:
+    def debug(self, msg: str = '') -> typing.NoReturn:
         """
         Shortcut to logging.debug() logging call
         :param msg: Message to log
@@ -458,7 +465,7 @@ class Logger:
         """
         self._log_at_level(level='DEBUG', msg=msg)
 
-    def exception(self, msg: str = '') -> None:
+    def exception(self, msg: str = '') -> typing.NoReturn:
         """
         Shortcut to logging.exception() logging call
         :param msg: Message to log
@@ -474,7 +481,7 @@ class Logger:
 
 if __name__ == '__main__':  # pragma: no cover
 
-    def test_routine(logger: logging.Logger, level: str, msg: str) -> None:
+    def test_routine(logger: logging.Logger, level: str, msg: str) -> typing.NoReturn:
         """
         Get the specified logger level method, and log msg.
 
@@ -488,7 +495,7 @@ if __name__ == '__main__':  # pragma: no cover
         test_log = getattr(logger, level.lower())
         test_log(msg)
 
-    def test_logging() -> None:
+    def test_logging() -> typing.NoReturn:
         """
         Execute a series of logging messages at different levels
 
