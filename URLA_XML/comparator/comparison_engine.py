@@ -1,3 +1,4 @@
+import pprint
 import typing
 
 from logger import logging
@@ -89,24 +90,28 @@ class ComparisonEngine:
                     src_children = self.get_leaf_nodes(src_node)
                     cmp_children = self.get_leaf_nodes(cmp_node)
 
-                    src_child_set = set([x.obj_path_str for x in src_children])
-                    cmp_child_set = set([x.obj_path_str for x in cmp_children])
+                    src_child_set = self._expand_objpath_pathsets(children=src_children)
+                    cmp_child_set = self._expand_objpath_pathsets(children=cmp_children)
+                    max_count = self._get_max_unique_count(set_1=src_child_set, set_2=cmp_child_set)
+
+                    log.debug(f"EXPANDED SOURCE OBJ_PATH SET:\n{pprint.pformat(src_child_set)}")
+                    log.debug(f"EXPANDED COMPARISON OBJ_PATH SET:\n{pprint.pformat(cmp_child_set)}")
 
                     if src_child_set == cmp_child_set:
                         log.debug(f"**MATCH**: {src_node.xpath_str} and {cmp_node.xpath_str}")
                         results_dict[src_node.xpath_str][self.MATCH] = cmp_node
-                        results_dict[src_node.xpath_str][self.CLOSEST_OBJ] = cmp_node
+                        results_dict[src_node.xpath_str][self.CLOSEST_OBJ] = None
                         results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT] = -1
+                        results_dict[src_node.xpath_str][self.TOTAL] = max_count
                         cmp_match_found.append(cmp_node.xpath_str)
                         break
 
                     else:
-                        # TODO: Expand comparison to individual element level, not subgroup level
-                        distance = len(src_child_set.intersection(cmp_child_set))
-                        if distance > results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT]:
-                            results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT] = distance
+                        num_matches = len(src_child_set.intersection(cmp_child_set))
+                        if num_matches > results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT]:
+                            results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT] = num_matches
                             results_dict[src_node.xpath_str][self.CLOSEST_OBJ] = cmp_node
-                            results_dict[src_node.xpath_str][self.TOTAL] = len(src_child_set)
+                            results_dict[src_node.xpath_str][self.TOTAL] = max_count
 
                         log.debug(f"DID NOT MATCH: {src_node.xpath_str} and {cmp_node.xpath_str}")
 
@@ -126,6 +131,32 @@ class ComparisonEngine:
 
         self._debug_print_results(results_dict)
         return results_dict
+
+    @staticmethod
+    def _get_max_unique_count(set_1: typing.Set[str], set_2: typing.Set[str]) -> int:
+
+        def _build_value(entry_str):
+            path_segment, attribute = entry_str.split(BaseElement.OBJ_PATH_DELIMITER)
+            attr = attribute.split(BaseElement.ENTRY_DELIMITER)[0]
+            return BaseElement.OBJ_PATH_DELIMITER.join([path_segment, attr])
+
+        total_list = [_build_value(item) for item in set_1]
+        total_list.extend([_build_value(item) for item in set_2])
+        return len(set(total_list))
+
+    @staticmethod
+    def _expand_objpath_pathsets(children: typing.List[BaseElement]):
+        final_list = []
+        starting_list = [x.obj_path_str for x in children]
+        for path in starting_list:
+            if BaseElement.OBJ_PATH_DELIMITER in path:
+                parts = path.split(BaseElement.OBJ_PATH_DELIMITER)
+                current_path = parts.pop(0)
+                for attribute in parts:
+                    final_list.append(BaseElement.OBJ_PATH_DELIMITER.join([current_path, attribute]))
+            else:
+                final_list.append(path)
+        return set(final_list)
 
     @classmethod
     def get_leaf_nodes(cls, node: BaseElement) -> typing.List[BaseElement]:

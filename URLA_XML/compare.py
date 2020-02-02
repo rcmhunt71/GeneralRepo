@@ -121,18 +121,13 @@ if __name__ == '__main__':
     if cli.args.outfile:
         write_debug_files(source_obj=source, compare_obj=compare)
 
-    src = source.model
-    cmp = compare.model
-
-    reports = ComparisonReport(src_model=src, cmp_model=cmp)
-
-    # log.info(f"\n{pprint.pformat(src.path_dict)}")
+    reports = ComparisonReport(src_model=source.model, cmp_model=compare.model)
 
     comp_eng = ComparisonEngine(primary=source, comparison=compare)
     ATTR_LIST = ["ASSET", "COLLATERAL", "EXPENSE", "LIABILITY", "LOAN", "PARTY"]
     for attr in ATTR_LIST:
         results = comp_eng.compare(attr)
-        log.info(reports.overall_matches(title=f"--> ELEMENT: {attr} <---", results=results))
+        log.info(reports.comparison_summary(title=f"*** ELEMENT TAG: <{attr}> ***", results=results))
         log.info(reports.closest_match_info(results=results))
 
     log.info(f"\n{reports.symmetrical_differences()}\n")

@@ -27,6 +27,7 @@ class ComparisonReport:
     CENTER = 'c'
     RIGHT = 'r'
     EMPTY = ''
+    TAG = 'Tag'
 
     COLUMN = namedtuple('column', field_names=("name", "alignment"))
 
@@ -47,9 +48,9 @@ class ComparisonReport:
         report = f"{self.DIFFERENCES}:"
         table = prettytable.PrettyTable()
 
-        # Column name and alignment
+        # Column name, order, and alignment
         setup = [self.COLUMN(self.SOURCE, self.CENTER),
-                 self.COLUMN(self.ATTRIBUTE, self.CENTER),
+                 self.COLUMN(self.TAG, self.CENTER),
                  self.COLUMN(self.PATH, self.LEFT)]
 
         table.field_names = [col.name for col in setup]
@@ -64,7 +65,7 @@ class ComparisonReport:
             table.add_row(row)
         return f"{report}\n{table.get_string()}"
 
-    def overall_matches(self, title: str, results=None) -> str:
+    def comparison_summary(self, title: str, results=None) -> str:
         """
         Builds table of overall results (perfect and closest matches)
         :param title: Title to prefix the table
@@ -75,7 +76,7 @@ class ComparisonReport:
         results = results or self.results
         table = prettytable.PrettyTable()
 
-        # Column name and alignment
+        # Column name, order, and alignment
         setup = [self.COLUMN(self.SOURCE, self.LEFT),
                  self.COLUMN(self.EXACT, self.LEFT),
                  self.COLUMN(self.CLOSEST, self.LEFT)]
@@ -93,7 +94,9 @@ class ComparisonReport:
                 else:
                     closest_match = None
                     if data[ComparisonEngine.CLOSEST_OBJ] is not None:
-                        closest_match = f"{data[ComparisonEngine.CLOSEST_OBJ].xpath_str}"
+                        closest_match = (f"{data[ComparisonEngine.CLOSEST_OBJ].xpath_str} "
+                                         f"({data[ComparisonEngine.CLOSEST_MATCH_COUNT]}/{data[ComparisonEngine.TOTAL]}"
+                                         f" matches)")
 
                 table.add_row([xpath, exact_match, closest_match])
 
@@ -107,6 +110,8 @@ class ComparisonReport:
 
         """
         title = 'Closest Match Report'
+
+        # Column name, order, and alignment
         columns = [
             self.COLUMN(self.SOURCE, self.LEFT),
             self.COLUMN(self.CLOSEST, self.LEFT),
