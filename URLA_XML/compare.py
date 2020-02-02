@@ -5,7 +5,11 @@ import pprint
 import typing
 
 from comparator.comparison_engine import ComparisonEngine
-from models.urla_xml_model import UrlaXML, UrlaXmlKeys
+from comparator.reporter import ComparisonReport
+from logger.logging import Logger
+from models.urla_xml_model import UrlaXML
+
+log = Logger()
 
 
 class CLIArgs:
@@ -14,12 +18,13 @@ class CLIArgs:
     See _defined_args for list and description of the available arguments
 
     """
-    def __init__(self):
+
+    def __init__(self) -> typing.NoReturn:
         self.parser = argparse.ArgumentParser()
         self._defined_args()
         self.args = self.parser.parse_args()
 
-    def _defined_args(self):
+    def _defined_args(self) -> typing.NoReturn:
         self.parser.add_argument(
             "-s", "--source", required=True,
             help="Source XML file to use for comparison to other MISMO formatted XML files")
@@ -32,14 +37,17 @@ class CLIArgs:
         self.parser.add_argument(
             "-o", "--outfile", action="store_true",
             help="[OPTIONAL] Create outfile of XML to dict conversion processes (for debugging)")
-
+        self.parser.add_argument(
+            "-x", "--debug", action="store_true",
+            help="[OPTIONAL] Enable debug logging."
+        )
 
 
 def _build_out_filename(target_dir: str, input_fname: str, ext: str) -> str:
     """
     Builds the out file name, based on desired directory and extension, using the filename of the input file
     (minus the file extension)
-    
+
     :param target_dir: (str) relative path to the directory to write the file
     :param input_fname: (str) name of input file
     :param ext: (str) file extension to append to the out file
@@ -86,9 +94,12 @@ def write_debug_files(source_obj: UrlaXML, compare_obj: UrlaXML) -> typing.NoRet
     compare_obj.dump_data_to_file(outfile=out_compare_file_spec, data_dict=compare_dict_info)
 
 
-# ------------------------------------------------
-#       MAIN SCRIPT LOGIC
-# ------------------------------------------------
+def build_log_filename(src: str, dst: str, target_dir='.') -> str:
+    src_portion = ".".join(src.split(os.path.sep)[-1].split(".")[:-1])
+    dst_portion = ".".join(dst.split(os.path.sep)[-1].split(".")[:-1])
+    return os.path.abspath(os.path.sep.join([target_dir, f"comp_{src_portion}_{dst_portion}.log"]))
+
+
 if __name__ == '__main__':
 
     VISUAL = False
@@ -97,39 +108,32 @@ if __name__ == '__main__':
     # Parse CLI args
     cli = CLIArgs()
 
+    log_filename = build_log_filename(src=cli.args.source, dst=cli.args.compare)
+    print(f"Logging to: {log_filename}.")
+    log = Logger(default_level=Logger.DEBUG if cli.args.debug else Logger.INFO,
+                 set_root=True, project="FiServ", filename=log_filename)
+
     # Create URLA XML Objects (read file, convert to nested OrderedDict structure)
     source = UrlaXML(source_file_name=cli.args.source, primary_source=True)
-    compare = UrlaXML(source_file_name=cli.args.compare)
+    compare = UrlaXML(source_file_name=cli.args.compare, primary_source=False)
 
     # Write debug files if requested
     if cli.args.outfile:
         write_debug_files(source_obj=source, compare_obj=compare)
 
-    # For dev and debug, create lists of sub-DEAL-<TAG> OrderedDicts
-    print()
-    deal_lists = [source.get_assets_elements(),
-                  source.get_liabilities_elements(),
-                  # source.get_expenses_elements(),
-                  source.get_loans_elements(),
-                  source.get_parties_elements(),
-                  source.get_collaterals_elements()]
+    src = source.model
+    cmp = compare.model
 
-    # Visually inspect the first element of each deal_list element
-    if VISUAL:
-        target_index = 1
-        for obj_list in deal_lists:
-            for idx, obj in enumerate(obj_list):
-                if idx == target_index - 1 and idx < len(obj_list):
-                    print(f"({idx}): {obj.type} [NAME = {obj.name}]\n"
-                          f"\tPATH: {obj.xpath}\n"
-                          f"\tID_SET: {obj.id_set}\n"
-                          f"\tDATA: {pprint.pformat(obj.data)}\n")
-            print()
+    reports = ComparisonReport(src_model=src, cmp_model=cmp)
 
-    if COMPARE:
-        engine = ComparisonEngine(primary=source, comparison=compare)
+    # log.info(f"\n{pprint.pformat(src.path_dict)}")
 
-        for deals_key in [UrlaXmlKeys.ASSETS, UrlaXmlKeys.LIABILITIES, UrlaXmlKeys.LOANS,
-                          UrlaXmlKeys.PARTIES, UrlaXmlKeys.COLLATERALS]:
-            engine.compare_and_map_singular_elements(element_name=deals_key, details=cli.args.detail)
+    comp_eng = ComparisonEngine(primary=source, comparison=compare)
+    ATTR_LIST = ["ASSET", "COLLATERAL", "EXPENSE", "LIABILITY", "LOAN", "PARTY"]
+    # ATTR_LIST = ['ASSET']
+    for attr in ATTR_LIST:
+        results = comp_eng.compare(attr)
+        log.info(reports.overall_matches(title=f"--> ELEMENT: {attr} <---", results=results))
+        log.info(reports.closest_match_info(results=results))
 
+    log.info(f"\n{reports.symmetrical_differences()}\n")

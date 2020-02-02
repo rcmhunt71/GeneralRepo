@@ -1,161 +1,245 @@
 import typing
 
-import prettytable
-from models.singular_xml_element_base_model import BaseDealElement
+from logger import logging
+from models.element_base_model import BaseElement
 from models.urla_xml_model import UrlaXML
 
-
-class DataMatch:
-    """ Simple data tracking class for mapping source entry to matching comparison entry """
-    def __init__(self, id_set, source_obj: BaseDealElement, found=False,
-                 match_obj: BaseDealElement = None) -> typing.NoReturn:
-        """
-
-        :param id_set: XPATH set and value (':' delimited)
-        :param source_obj: Source Inherited BaseDealElement
-        :param found: (bool) True = match found
-        :param match_obj: If match is True, the corresponding Comparison BaseDealElement
-
-        """
-        self.id_set = id_set
-        self.source_obj = source_obj
-        self.found = found
-        self.match_obj = match_obj
+log = logging.Logger()
 
 
 class ComparisonEngine:
-    def __init__(self, primary: UrlaXML, comparison: UrlaXML):
+    MATCH = "Match"
+    CLOSEST_MATCH_COUNT = "ClosestMatchCount"
+    CLOSEST_OBJ = "ClosestObj"
+    SRC_OBJ = 'SrcObj'
+    CMP_OBJ = 'CmpObj'
+    TOTAL = 'Total'
+    HEADER_LENGTH = 120
+
+    def __init__(self, primary: UrlaXML, comparison: UrlaXML) -> typing.NoReturn:
         self.primary = primary
         self.comparison = comparison
 
-    def compare_and_map_singular_elements(self, element_name: str, details: bool = False) -> typing.List[DataMatch]:
+    def compare(self, element_name: str) -> typing.Dict[str, dict]:
         """
-        Compare the source and comparison elements for a given DealElement type. If a match is found, map the
-        indices.
 
-        e.g.
-           - Src DealElement index 0 maps to Cmp DealElement index 7,
-           - and the inverse, Cmp DealElement index 7 maps to Src DealElement index 0
+        :param element_name:
+        :return:
+        """
+        if element_name not in self.primary.model.path_dict.keys():
+            log.error(f"ERROR: Element '{element_name}' not found in the primary model. Available elements:")
+            log.error(sorted(list(self.primary.model.path_dict.keys())))
+            return {}
 
-        :param element_name: name of DealElement type to compare (should be plural, so all singular elems are compared).
-        :param details: (boolean) - If True, generate a summary report
+        for line in self._build_log_header(f"Comparing element: '{element_name}'"):
+            log.info(line)
 
-        :return: List of Src DataMatch objects with corresponding match data (or noted as unmatched)
+        # Get the target nodes from each XML file
+        log.debug(f"Getting SRC NODES")
+        src_nodes = self.get_elements(element_name=element_name, root=self.primary.model)
+
+        log.debug(f"Getting CMP NODES")
+        cmp_nodes = self.get_elements(element_name=element_name, root=self.comparison.model)
+
+        return self._compare_element_lists(source_list=src_nodes, compare_list=cmp_nodes)
+
+    def _compare_element_lists(self, source_list: typing.List[BaseElement],
+                               compare_list: typing.List[BaseElement]) -> typing.Dict[str, dict]:
+        """
+        Given two nodes (one from each source), comnpare the node attributes and children to find the matches and
+        provide closest matches.
+
+        :param source_list: List of nodes to compare and verify
+        :param compare_list: List of nodes to compare (source of truth)
+
+        :return: dictionary of: key=src node xpaths, value={dict of source data, match data, and nearest match)
 
         """
-        # Verify requested DealElement is plural (ends in 's') and is a recognized model.
-        if (not hasattr(self.primary, f"get_{element_name.lower()}_elements") or
-                not element_name.lower().endswith('s')):
-            print(f"**ERROR**: Unrecognized Plural Deal Type: {element_name.lower()}.")
-            return []
+        log.debug(f"SRC NODES: {[x.xpath_str for x in source_list]}")
+        log.debug(f"CMP NODES: {[x.xpath_str for x in compare_list]}")
 
-        # Get list of singular DealElements (type specified via parameters)
-        source_data_elem = getattr(self.primary, f"get_{element_name.lower()}_elements")()
-        comp_data_elem = getattr(self.comparison, f"get_{element_name.lower()}_elements")()
+        # Define the result tracking structure (for each element with the target tag)
+        # Key: The XPATH for each target
+        # Values: SRC = complete source structure underneath the target
+        #         MATCH: Matching Node
+        #
+        results_dict = dict(
+            [(src.xpath_str, {self.SRC_OBJ: src,
+                              self.MATCH: None,
+                              self.CLOSEST_MATCH_COUNT: 0,
+                              self.TOTAL: 0,
+                              self.CLOSEST_OBJ: None}) for src in source_list])
+        cmp_match_found = []
 
-        # Build list of tuples to track mappings between src and cmp
-        source_data = [DataMatch(id_set=elem.id_set, found=False, source_obj=elem, match_obj=None) for elem
-                       in source_data_elem]
-        comp_data = [DataMatch(id_set=elem.id_set, found=False, source_obj=elem, match_obj=None) for elem
-                     in comp_data_elem]
+        for src_node in source_list:
+            log.debug(f"SOURCE NODE XPATH: {src_node.xpath_str}")
 
-        # Iterate through src data looking for matches in the comparison data
-        for src_elem in source_data:
-            for comp_elem in comp_data:
+            for cmp_node in compare_list:
+                log.debug(f"COMPARISON NODE XPATH: {cmp_node.xpath_str}")
 
-                # If comparison element already has been matched, skip comparing this element to the source
-                if comp_elem.found:
+                # Don't compare if match has been found
+                if cmp_node.xpath_str in cmp_match_found:
+                    log.debug(f"COMPARISON NODE ({cmp_node.xpath_str}) ALREADY MATCHED")
                     continue
 
-                # If the SRC is identical OR is a superset of the comparison, map the elements.
-                if src_elem.id_set >= comp_elem.id_set:
+                # If the src node matches current cmp node, then compare elements (including children)
+                if self._compare_node(src_node=src_node, cmp_node=cmp_node):
+                    log.debug(f"CMP node matches (attr + #_child): {cmp_node.xpath_str} "
+                              f"-> Checking descendants...")
+                    src_children = self.get_leaf_nodes(src_node)
+                    cmp_children = self.get_leaf_nodes(cmp_node)
 
-                    # Map the CMP object to the SRC object
-                    src_elem.found = True
-                    src_elem.match_obj = comp_elem.source_obj
+                    src_child_set = set([x.obj_path_str for x in src_children])
+                    cmp_child_set = set([x.obj_path_str for x in cmp_children])
 
-                    # Map the SRC object to the CMP object
-                    comp_elem.found = True
-                    comp_elem.match_obj = src_elem.source_obj
+                    if src_child_set == cmp_child_set:
+                        log.debug(f"**MATCH**: {src_node.xpath_str} and {cmp_node.xpath_str}")
+                        results_dict[src_node.xpath_str][self.MATCH] = cmp_node
+                        results_dict[src_node.xpath_str][self.CLOSEST_OBJ] = cmp_node
+                        results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT] = -1
+                        cmp_match_found.append(cmp_node.xpath_str)
+                        break
+                    else:
+                        distance = len(src_child_set.intersection(cmp_child_set))
+                        if distance > results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT]:
+                            results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT] = distance
+                            results_dict[src_node.xpath_str][self.CLOSEST_OBJ] = cmp_node
+                            results_dict[src_node.xpath_str][self.TOTAL] = len(src_child_set)
 
-                    # For manual debugging purposes only... hence always FALSE
-                    if details and False:
-                        print(f"MATCH FOUND for {element_name}:\n   SRC:\n"
-                              f"   {src_elem.id_set} ({src_elem.source_obj.seq_num})")
-                        print(f"   COMP:\n   {src_elem.match_obj.id_set} ({src_elem.match_obj.seq_num})\n")
+                        log.debug(f"DID NOT MATCH: {src_node.xpath_str} and {cmp_node.xpath_str}")
+                        matches = src_child_set.intersection(cmp_child_set)
+                        s_differences = src_child_set.symmetric_difference(cmp_child_set)
+                        for match in matches:
+                            log.debug(f"MATCHED: {match}")
 
-        # If details were requested, build and print a results table.
-        if details:
-            self.build_results_table(results=source_data)
+                        for miss in sorted(s_differences):
+                            target = "SRC" if miss in src_child_set else "CMP"
+                            log.debug(f"{target}: {miss}")
+                    log.debug("")
 
-        # Otherwise, just print a 1-line summary.
-        else:
-            matches = sum([1 for datum in source_data if datum.found])
-            print(f"SUMMARY FOR '{element_name}': {matches} out of {len(source_data)} source elements matched.")
+                else:
+                    log.debug("SRC node and CMP node did not match (attributes and number of children)")
+                    log.debug("")
 
-        return source_data
+        self._debug_print_results(results_dict)
+        return results_dict
 
-    @staticmethod
-    def build_results_table(results: typing.List[DataMatch]) -> typing.NoReturn:
+    @classmethod
+    def get_leaf_nodes(cls, node: BaseElement) -> typing.List[BaseElement]:
         """
-        Build table of results
+        Gets all leaf nodes below the provided root node. (Leaf = node without children)
+        :param node: Specific node to use to start checking for leaf nodes (self + descendants)
+        :return: List of leaf nodes (List of BaseElements)
 
-        :param results: List of DataMatch objects (generated by compare_and_map_singular_elements)
+        """
+        leaves = []
+        if not node.children:
+            leaves.append(node)
+        else:
+            for child in node.children:
+                leaves.extend(cls.get_leaf_nodes(node=child))
+        return leaves
+
+    # -------------------------------------------------------------------------------------
+    @staticmethod
+    def _compare_node(src_node: BaseElement, cmp_node: BaseElement) -> bool:
+        """
+        Compare the attributes and the number of children. If they match, the nodes are considered equal.
+
+        :param src_node: Source Node
+        :param cmp_node: Comparisan Node
+
+        :return: Bool: True = nodes match.
+        """
+        # Check if attributes (data) match and number/type of children
+        attrs = sorted(src_node.attributes) == sorted(cmp_node.attributes)
+        child_types = (sorted([child.type for child in src_node.children]) ==
+                       sorted([child.type for child in cmp_node.children]))
+
+        return attrs & child_types
+
+    def get_elements(self, element_name: str, root: BaseElement) -> typing.List[BaseElement]:
+        """
+        Get the child elements of the element_name using the relative "root" node
+
+        :param element_name: Name of element tag to to find
+        :param root: relative starting node
+
+        :return: List of nodes underneath the relative root
+
+        """
+
+        # Get the XPATH that corresponds to the element name
+        paths = root.path_dict[element_name]
+
+        log.debug(f"List of XPath(s) to '{element_name}': {paths}")
+
+        results = []
+        for path in paths:
+            results.extend(self._get_elements(path=path.split(root.XPATH_DELIMITER), starting_node=root))
+        log.debug(f"RESULTS: {[x.xpath_str for x in results]}")
+        return results
+
+    def _get_elements(self, path: typing.List[str], starting_node: BaseElement) -> typing.List[BaseElement]:
+        """
+        Get the element(s) under the specified path
+        :param path: List of node types required to create the path to the target node.
+        :param starting_node: Node used to start the retrieval process
+
+        :return: List of Elements
+
+        """
+        results = []
+        current_type = path[0]
+        extra_debugging = False
+
+        if extra_debugging:
+            log.debug(f"Rec'd Path: {path}")
+            log.debug(f"Rec'd Starting Node: {starting_node.type} --> '{starting_node.name}'")
+            log.debug(f"Current Type to look for: {current_type}\n")
+
+        matching_child_nodes = starting_node.get_children_by_type(child_type=current_type)
+
+        # If the current node type matches the desired type and there are no more nodes in the path, return the node
+        if matching_child_nodes:
+            if len(path) == 1:
+
+                log.debug(f"Node type ({starting_node.type}) has children of current type ({current_type}) "
+                          f"and path has single element ({path}).\nReturning matching child nodes: "
+                          f"{[x.xpath_str for x in matching_child_nodes]}\n")
+
+                return matching_child_nodes
+
+            new_path = path[1:]                      # Advance to the next step
+            for child_node in matching_child_nodes:  # Next set of nodes to evaluate
+                results.extend(self._get_elements(path=new_path, starting_node=child_node))
+
+        return results
+
+    def _debug_print_results(self, results_dict: typing.Dict[str, dict]) -> typing.NoReturn:
+        """
+        Quick and easy display of result output
+        :param results_dict: results dictionary
 
         :return: None
 
         """
-        # Constants
-        loc, name, index, path = "LOC", "Index", "Name", "Path"
-        zero_out = 'None'
-        src_label, comp_label = "SRC", "CMP"
+        for xpath, data in results_dict.items():
+            debug_msg = f"XPATH: {xpath} --> "
+            if data[self.MATCH] is not None:
+                debug_msg += f"{data[self.MATCH].xpath_str}"
+            else:
+                debug_msg += "None"
+                if data[self.CLOSEST_OBJ] is not None:
+                    debug_msg += (f"--> Closest Match: {data[self.CLOSEST_OBJ].xpath_str} with "
+                                  f"{data[self.CLOSEST_MATCH_COUNT]} descendant(s) matching.")
+            log.debug(debug_msg)
 
-        # Define table columns/headers and column formatting
-        headers = [loc, name, path, index]
-        table = prettytable.PrettyTable(headers)
-        table.align[index] = 'c'
-        table.align[path] = 'l'
+    def _build_log_header(self, tag):
+        border = "=" * self.HEADER_LENGTH
 
-        # Determine how many matches were found.
-        matches = sum([1 for datum in results if datum.found])
-
-        # Get type of element being reported
-        label = results[0].source_obj.type
-
-        # If there were results...
-        if results is not None:
-
-            # Add a row for each SOURCE element
-            for index, datum in enumerate(results):
-                table.add_row(
-                    [src_label, datum.source_obj.index, datum.source_obj.xpath, datum.source_obj.name]
-                )
-
-                # If a match was found, add a row for the match
-                if datum.match_obj is not None:
-                    table.add_row([comp_label, datum.match_obj.index, datum.match_obj.xpath, datum.match_obj.name])
-
-                    # If it is not the last result in the last, add a blank row
-                    if index < len(results) - 1:
-                        table.add_row(['' for _ in range(len(headers))])
-
-                # No matches were found for this element (but other elements did have a match), so
-                # indicate the COMP file did not have a match for this result.
-                elif matches > 0:
-                    row_data = [comp_label, zero_out]
-                    row_data.extend(['' for _ in range(len(headers) - 2)])
-                    table.add_row(row_data)
-
-                    # If it is not the last result in the last, add a blank row
-                    if index < len(results) - 1:
-                        table.add_row(['' for _ in range(len(headers))])
-
-            # Print title and summary of table and then the table itself.
-            print(f"'{label}' Element Type: {matches} OF {len(results)} MATCHED.")
-            print(f"{table.get_string()}\n\n")
-
-        # Code should never get here...
-        # But need to output something (just in case) so, it is clear the routine did execute.
-        else:
-            label = results[0].source_obj.type
-            print(f"'{label}' Element type: No results to display.\n")
+        header = "{{tag:^{entry_length}}}".format(entry_length=self.HEADER_LENGTH)
+        header = header.format(tag=tag)
+        return [f"+{border}+",
+                f"|{header}|",
+                f"+{border}+"]
