@@ -9,3 +9,4 @@ class UrlaXmlKeys:
     """
     SEQ_NUM: str = '@SequenceNumber'
     XLINK_LABEL: str = '@xlink:label'
+    LOAN_ROLE_TYPE: str = '@LoanRoleType'

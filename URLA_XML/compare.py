@@ -130,7 +130,6 @@ if __name__ == '__main__':
 
     comp_eng = ComparisonEngine(primary=source, comparison=compare)
     ATTR_LIST = ["ASSET", "COLLATERAL", "EXPENSE", "LIABILITY", "LOAN", "PARTY"]
-    # ATTR_LIST = ['ASSET']
     for attr in ATTR_LIST:
         results = comp_eng.compare(attr)
         log.info(reports.overall_matches(title=f"--> ELEMENT: {attr} <---", results=results))

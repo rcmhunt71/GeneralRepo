@@ -99,7 +99,9 @@ class ComparisonEngine:
                         results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT] = -1
                         cmp_match_found.append(cmp_node.xpath_str)
                         break
+
                     else:
+                        # TODO: Expand comparison to individual element level, not subgroup level
                         distance = len(src_child_set.intersection(cmp_child_set))
                         if distance > results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT]:
                             results_dict[src_node.xpath_str][self.CLOSEST_MATCH_COUNT] = distance
@@ -107,6 +109,7 @@ class ComparisonEngine:
                             results_dict[src_node.xpath_str][self.TOTAL] = len(src_child_set)
 
                         log.debug(f"DID NOT MATCH: {src_node.xpath_str} and {cmp_node.xpath_str}")
+
                         matches = src_child_set.intersection(cmp_child_set)
                         s_differences = src_child_set.symmetric_difference(cmp_child_set)
                         for match in matches:
@@ -222,7 +225,6 @@ class ComparisonEngine:
         :param results_dict: results dictionary
 
         :return: None
-
         """
         for xpath, data in results_dict.items():
             debug_msg = f"XPATH: {xpath} --> "
@@ -235,7 +237,12 @@ class ComparisonEngine:
                                   f"{data[self.CLOSEST_MATCH_COUNT]} descendant(s) matching.")
             log.debug(debug_msg)
 
-    def _build_log_header(self, tag):
+    def _build_log_header(self, tag: str) -> typing.List[str]:
+        """
+
+        :param tag:
+        :return:
+        """
         border = "=" * self.HEADER_LENGTH
 
         header = "{{tag:^{entry_length}}}".format(entry_length=self.HEADER_LENGTH)

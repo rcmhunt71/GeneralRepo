@@ -141,10 +141,9 @@ class BaseElement:
         Traverse data tree, recording the path to each unique element type
 
         :param paths: Dictionary of elements, value equals list of elements required to reach key element.
-
         :return: Dictionary of elements, value equals list of elements required to reach key element.
-        """
 
+        """
         # If first value in structure, initialize the path dictionary
         if paths is None:
             paths = {self.type: [self.traversal_list_str]}
