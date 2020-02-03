@@ -151,7 +151,7 @@ class ComparisonReportEngine:
         columns = [
             self.COLUMN_DEF(self.PRIMARY_PATH, self.LEFT),
             self.COLUMN_DEF(self.CLOSEST, self.LEFT),
-            self.COLUMN_DEF(self.ATTRIBUTE, self.LEFT),
+            self.COLUMN_DEF(self.TAG, self.LEFT),
             self.COLUMN_DEF(self.DIFFERENCE, self.CENTER),
             self.COLUMN_DEF(self.PRIMARY_VALUE, self.LEFT),
             self.COLUMN_DEF(self.BASIS_VALUE, self.LEFT),
