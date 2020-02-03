@@ -11,6 +11,8 @@ from models.urla_xml_model import UrlaXML
 
 log = Logger()
 
+# TODO: Rename all source/comparison references (method and var names) to primary/basis.
+
 
 class CLIArgs:
     """
@@ -25,11 +27,11 @@ class CLIArgs:
 
     def _defined_args(self) -> typing.NoReturn:
         self.parser.add_argument(
-            "-s", "--source", required=True,
-            help="Source XML file to use for comparison to other MISMO formatted XML files")
+            "-p", "--primary", required=True,
+            help="Primary XML file to be compared to other MISMO formatted XML files")
         self.parser.add_argument(
-            "-c", "--compare", required=True,
-            help="MISMO formatted XML file to verify against source XML file")
+            "-b", "--basis", required=True,
+            help="MISMO formatted XML file used as a basis or 'source of truth' to verify against the primary XML file")
         self.parser.add_argument(
             "-o", "--outfile", action="store_true",
             help="[OPTIONAL] Create outfile of XML to dict conversion processes (for debugging)")
@@ -112,24 +114,24 @@ if __name__ == '__main__':
     cli = CLIArgs()
 
     # Build logfile file spec and instantiate logger
-    log_filename = build_log_filespec(src=cli.args.source, dst=cli.args.compare)
+    log_filename = build_log_filespec(src=cli.args.primary, dst=cli.args.basis)
     print(f"Logging to: {log_filename}.")
     log = Logger(default_level=Logger.DEBUG if cli.args.debug else Logger.INFO,
                  set_root=True, project="FiServ", filename=log_filename)
 
     # Create URLA XML objects (read file, convert to nested OrderedDict structure)
-    source = UrlaXML(source_file_name=cli.args.source, primary_source=True)
-    compare = UrlaXML(source_file_name=cli.args.compare, primary_source=False)
+    primary = UrlaXML(source_file_name=cli.args.primary, primary_source=True)
+    basis = UrlaXML(source_file_name=cli.args.basis, primary_source=False)
 
     # Write debug files if requested
     if cli.args.outfile:
-        write_debug_files(source_obj=source, compare_obj=compare)
+        write_debug_files(source_obj=primary, compare_obj=basis)
 
     # Instantiate report generator
-    reports = ComparisonReportEngine(src_model=source.model, cmp_model=compare.model)
+    reports = ComparisonReportEngine(src_model=primary.model, cmp_model=basis.model)
 
     # Instantiate comparison engine
-    comp_eng = ComparisonEngine(primary=source, comparison=compare)
+    comp_eng = ComparisonEngine(primary=primary, comparison=basis)
 
     # Do comparison on the following tags and generate result reports
     TAG_LIST = ["ASSET", "COLLATERAL", "EXPENSE", "LIABILITY", "LOAN", "PARTY"]

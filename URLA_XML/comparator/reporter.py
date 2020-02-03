@@ -2,6 +2,7 @@ from collections import namedtuple
 import typing
 
 import prettytable
+
 from comparator.comparison_engine import ComparisonEngine
 from logger.logging import Logger
 
@@ -12,15 +13,17 @@ class ComparisonReportEngine:
 
     # Table column headers
     ATTRIBUTE = "Attribute"
+    BASIS = "Basis"
+    BASIS_VALUE = "Base Value"
     CLOSEST = "Closest Match"
-    COMPARISON = "Comparison"
-    COMP_VALUE = "Comparison Value"
     DIFFERENCE = "Diff?"
     DIFFERENCES = "ELEMENT DIFFERENCES"
     EXACT = "Exact Match"
     PATH = "Path"
-    SOURCE = "Source"
-    SOURCE_VALUE = "Source Value"
+    PRIMARY = "Primary"
+    PRIMARY_PATH = "Primary Path"
+    PRIMARY_VALUE = "Primary Value"
+    SOURCE = 'Source'
     TAG = "Tag"
     XPATH = "XPath"
 
@@ -77,10 +80,10 @@ class ComparisonReportEngine:
 
             # Determine which dictionary had the current element (unique tag path)
             if elem in self.src_model.path_dict:
-                row = [self.SOURCE.upper(), elem,
+                row = [self.PRIMARY.upper(), elem,
                        '//' + self.src_model.XPATH_DELIMITER.join(self.src_model.path_dict[elem])]
             else:
-                row = [self.COMPARISON.upper(), elem,
+                row = [self.BASIS.upper(), elem,
                        '//' + self.cmp_model.XPATH_DELIMITER.join(self.cmp_model.path_dict[elem])]
 
             table.add_row(row)
@@ -99,7 +102,7 @@ class ComparisonReportEngine:
         table = prettytable.PrettyTable()
 
         # Column name, order, and alignment
-        setup = [self.COLUMN_DEF(self.SOURCE, self.LEFT),
+        setup = [self.COLUMN_DEF(self.PRIMARY_PATH, self.LEFT),
                  self.COLUMN_DEF(self.EXACT, self.LEFT),
                  self.COLUMN_DEF(self.CLOSEST, self.LEFT)]
         table.field_names = [x.name for x in setup]
@@ -146,12 +149,12 @@ class ComparisonReportEngine:
 
         # Column name, order, and alignment
         columns = [
-            self.COLUMN_DEF(self.SOURCE, self.LEFT),
+            self.COLUMN_DEF(self.PRIMARY_PATH, self.LEFT),
             self.COLUMN_DEF(self.CLOSEST, self.LEFT),
             self.COLUMN_DEF(self.ATTRIBUTE, self.LEFT),
             self.COLUMN_DEF(self.DIFFERENCE, self.CENTER),
-            self.COLUMN_DEF(self.SOURCE_VALUE, self.LEFT),
-            self.COLUMN_DEF(self.COMP_VALUE, self.LEFT),
+            self.COLUMN_DEF(self.PRIMARY_VALUE, self.LEFT),
+            self.COLUMN_DEF(self.BASIS_VALUE, self.LEFT),
         ]
 
         # Define table
@@ -187,10 +190,10 @@ class ComparisonReportEngine:
 
                             # Check if XPATH had a value in the source and comparison tables.
                             # If so, save to add to the row data.
-                            src_value = (self.NO_ENTRY if attr_data[self.SOURCE_VALUE] == "" else
-                                         attr_data[self.SOURCE_VALUE])
-                            cmp_value = (self.NO_ENTRY if attr_data[self.COMP_VALUE] == "" else
-                                         attr_data[self.COMP_VALUE])
+                            src_value = (self.NO_ENTRY if attr_data[self.PRIMARY_VALUE] == "" else
+                                         attr_data[self.PRIMARY_VALUE])
+                            cmp_value = (self.NO_ENTRY if attr_data[self.BASIS_VALUE] == "" else
+                                         attr_data[self.BASIS_VALUE])
 
                             # If the source and comparison values were different, denote this in the row data.
                             # Build row data with known information.
@@ -253,17 +256,17 @@ class ComparisonReportEngine:
                 if leaf_tag_name not in diff_dict[src_xpath][cmp_xpath]:
                     diff_dict[src_xpath][cmp_xpath][leaf_tag_name] = {
                         self.XPATH: attr_xpath,
-                        self.SOURCE_VALUE: self.NO_ENTRY,
-                        self.COMP_VALUE: self.NO_ENTRY}
+                        self.PRIMARY_VALUE: self.NO_ENTRY,
+                        self.BASIS_VALUE: self.NO_ENTRY}
 
                 # If the current attribute difference is in the src set
                 if attr_found in src_child_set:
                     diff_dict[src_xpath][cmp_xpath][leaf_tag_name][
-                        self.SOURCE_VALUE] = src.ENTRY_DELIMITER.join(cmp_attr_data[1:])
+                        self.PRIMARY_VALUE] = src.ENTRY_DELIMITER.join(cmp_attr_data[1:])
 
                 # If the current attribute difference is in the cmp set
                 if attr_found in cmp_child_set:
                     diff_dict[src_xpath][cmp_xpath][leaf_tag_name][
-                        self.COMP_VALUE] = src.ENTRY_DELIMITER.join(cmp_attr_data[1:])
+                        self.BASIS_VALUE] = src.ENTRY_DELIMITER.join(cmp_attr_data[1:])
 
         return diff_dict
