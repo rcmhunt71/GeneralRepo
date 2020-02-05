@@ -39,53 +39,70 @@ The response model class will deserialize the JSON-formatted API response into a
 *response_model.status* - The response status from the REST call. This is also in the raw response (response_model.response.raw), but is exposed in the response_model for simplification/ease of use. 
 
 # CODE ORGANIZATION
-**NOTE**: Code organization is modeled after the [API documentation](https://confluence.pclender.com/display/technicalwiki/PRICE+API+User+Guide).
+**NOTE**: Code organization is based on the hierarchy outlined in the [API documentation](https://confluence.pclender.com/display/technicalwiki/PRICE+API+User+Guide).
  * **Call domains (loans, assets, data, persons)**
  * **Directories**
-    * *Models*
-    * *Requests*
-    * *Responses*
-    * *Clients*
+    * **_Models_**:
+    * **_Requests_**:
+    * **_Responses_**:
+    * **_Clients_**:
  
  # REQUEST MODEL ARCHITECTURE
- * **BaseRequest Model**
-   * *Class*
-   * *Assumptions*
-   * *Usage*
+ * **Base Request Model**
+   * **_Class_**:
+   * **_Assumptions_**:
+   * **_Usage_**:
    
  * **ModelKey Classes**
-   * *Class/Architecture* 
-   * *Usage*
+   * **_Class/Architecture_**: 
+   * **_Usage_**:
  
 # RESPONSE MODEL ARCHITECTURE
- * **BaseResponse Model** 
-   * *Class*
-   * *Assumptions*
-   * *Usage*
+ * **Base Response Models**
+ 
+     Most API responses, while specific and unique, have a common (core) set of attributes. (See the [API documentation](https://confluence.pclender.com/display/technicalwiki/PRICE+API+User+Guide).) This commonality forms the definition of the base response model.  
+   * **Class: BaseResponse** (_PRICE.base.responses.base_response.BaseResponse_)
    
- * **Common Response Model**
-   * *Class*
-   * *Assumptions*
-   * *Usage*
+       * **_Description_**: This base class is for a single instance within the response (vs. a list context of elements). This class is architected to be generalized and abstracted; it is not meant to be instantiated directly. The base class should be a superclass (inherited from) for a given API response. The base class will create:
+         
+            * the common (base) set of attributes 
+            * specific attributes provided to the class at instantiation (ADD_KEYS and SUB_MODELS lists). 
+
+       * **_Assumptions_**: 
+       
+       * **_Usage_**: 
    
+   * **Class: BaseListResponse** (_PRICE.base.responses.base_response.BaseListResponse_)
+   
+       * **_Description_**: This base class defined as a list context of common elements (models). This class is architected to be generalized and abstracted; it is not meant to be instantiated directly. The base class should be a superclass (inherited from) for a given API response. The base class will:
+         
+            * create a list context model,
+            * populate the model with a common submodel as elements of the list. (SUB_MODEL - single model type)
+        
+       * **_Assumptions_**:
+       * **_Usage_**:
+     
  * **Specific Response Models**
-    * *Class*
-    * *Assumptions*
-    * *Usage*
+    * **Class**:
+    * **_Assumptions_**:
+    * **_Usage_**:
      
  * **ModelKey Classes**
-    * *Class/Architecture*
-    * *Usage*
+    * **_Class/Architecture_**:
+    * **_Usage_**:
     
  * **Enumeration Classes**
-    * *Why ENUM Classes?*
-    * *How to use*
+    * **_Why ENUM Classes?_**
+    
+        _Add text here._
+    
+    * **_How To Use_**:
  
 ## CLIENT HIERARCHY AND ORGANIZATION  
 * **Client Organization**
-    * *Primary Client*
-    * *Domain Client*
-    * *Subdomain Client*
+    * **_Primary Client_**:
+    * **_Domain Client_**:
+    * **_Subdomain Client_**:
 
 -------------------------------------------------
 
@@ -165,6 +182,10 @@ The primary focus of the unittests is not verify the specific code implementatio
     Specific test classes or test methods can be executed (as shown above). 
 
     If those arguments are not provided, [unittest](https://docs.python.org/3.8/library/unittest.html) will scan the directories for any file with the **_test\<filename>_** file spec, instantiate any class with **_Test\<Class>_** name and all methods within the class that are named **_test_\<testname>**.
+    
+    _Verbosity_:
+    
+    `-v`: verbose ==> `-vv`: increased verbosity ==> `-vvv`: maximum verbosity
 
 * **Issues**
 
