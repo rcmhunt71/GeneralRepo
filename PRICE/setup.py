@@ -8,5 +8,5 @@ setup(name='PRICE',
       author='Fiserv',
       author_email='',
       packages=[],
-      requires=['PrettyTable'],
+      requires=['PrettyTable', 'requests'],
       )
