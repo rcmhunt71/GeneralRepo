@@ -24,7 +24,7 @@ The request model is class that is instantiated based on the client call paramet
        compression:  application/bzip  
  
 ### REST Call
-The REST call is the actual HTTP request made to the server. 
+The REST call is the actual HTTP request made to the server using Python's [Requests](https://requests.readthedocs.io/en/master/) 3rd party library on [pypi](https://pypi.org/). 
    
 ### Response Model
 The response model class will deserialize the JSON-formatted API response into a corresponding response object. The object abstracts the specific JSON format from the consumer (e.g. - tests), so if the response format structure changes, the model logic will be updated but consumers of the model will not be required to modify their existing logic.  
