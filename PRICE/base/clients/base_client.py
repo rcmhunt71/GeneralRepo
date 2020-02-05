@@ -95,4 +95,6 @@ class BaseClient:
         log.debug(f"Response Model: {type(response_model)}")
 
         response_model.response = response
+        response_model.status = response.status
+        response_model.content = response.content
         return response_model
