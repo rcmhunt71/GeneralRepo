@@ -2,9 +2,13 @@
 The PRICE client follows a common serialization/abstraction client architecture, where each client call requires a request model, a response model, and a single REST call to a predefined server. 
 
 ## Requirements
-* Python (version) - more info needed
-* Packages - more info needed
-* Access (TBD) - more info needed
+* **Python 3.6+**
+* **Python Packages**: There a few external python packages that need to be installed for the client to be functional:
+  * [Requests](https://requests.readthedocs.io/en/master/)
+  * [PrettyTable](https://pypi.org/project/PrettyTable/) - [Tutorial/Documentation](http://zetcode.com/python/prettytable/) 
+  
+  These should be installed as part of the setup process, but currently, the setup process is not including these packages. (setup.py needs to be debugged; packages are listed, but are not being installed - _pip security/SSL Cert issues_? Chris will look into possible  --trusted-host configuration options.)
+* **Access**: In order to be able to connect to the PRICE APIs, credentials, endpoints, and database ids needs to be provided to the user(s).
 
 ## Client Call Code Flow
 
