@@ -1,6 +1,11 @@
 # PRICE CLIENT ARCHITECTURE
 The PRICE client follows a common serialization/abstraction client architecture, where each client call requires a request model, a response model, and a single REST call to a predefined server. 
 
+## Requirements
+* Python (version) - more info needed
+* Packages - more info needed
+* Access (TBD) - more info needed
+
 ## Client Call Code Flow
 
 The client will:
